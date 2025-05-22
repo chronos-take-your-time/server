@@ -1,0 +1,17 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "servidor para o chronos app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "chronos",
+  "license": "ISC",
+  "dependencies": {
+    "@tldraw/sync-core": "^3.12.2",
+    "express": "^5.1.0"
+  }
+}
