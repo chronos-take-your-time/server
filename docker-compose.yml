@@ -9,4 +9,4 @@ services:
       - .:/app
     environment:
       - NODE_ENV=development
-    command: npm run dev
+    command: npm start
