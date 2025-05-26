@@ -2,10 +2,14 @@ const express = require('express');
 const app = express();
 const port = 3000;
 
-const olaRoutes = require('./routes/ola');
+const rootRoute = require('./routes/ola');
+const olaRoute = require('./routes/ola');
 
-app.use('/ola', olaRoutes);
+app.use('/', rootRoute);
+app.use('/ola', olaRoute);
 
 app.listen(port, () => {
   console.debug(`[SUCCESS]: Chronos listening on port ${port}`);
 });
+
+
