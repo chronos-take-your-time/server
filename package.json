@@ -14,7 +14,9 @@
   "dependencies": {
     "@clerk/backend": "^1.33.1",
     "@tldraw/sync-core": "^3.12.2",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
