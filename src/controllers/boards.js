@@ -29,7 +29,7 @@ if (!fs.existsSync(baseDir)) {
 function createBoard(teamId, boardId, boardData = {}) {
   const teamPath = path.join(baseDir, teamId);
   if (!fs.existsSync(teamPath)) {
-    return { status: 'error', message: `does not exists at team@${teamId}`, resource: `team@${teamId}` };
+    return { status: 'error', message: `does not exist`, resource: `team@${teamId}` };
   }
   const boardPath = path.join(teamPath, `${boardId}.json`);
   fs.writeFileSync(boardPath, JSON.stringify(boardData, null, 2));
