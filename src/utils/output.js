@@ -1,5 +1,5 @@
 /**
- * Console output made readable for humans
+ * Console output made readable for humans.
  * @param {'success'|'error'|'info'} type - Message type
  * @param {string} message - Main message content
  * @param {string} [entity] - Optional entity identifier (e.g., "team@123")
