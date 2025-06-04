@@ -15,4 +15,4 @@ function humanOutput(type, message, entity="") {
   console.log(`${prefixes[type] || '[ ]'} ${entityPart}${message}`);
 }
 
-modules.export = { humanOutput };
+module.exports = { humanOutput };
