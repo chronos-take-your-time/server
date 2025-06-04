@@ -4,6 +4,7 @@ import { createClerkClient } from '@clerk/backend'
 const express = require('express');
 const app = express();
 const port = 3000;
+const createClerkClient = require('@clerk/backend').createClerkClient;
 
 // routes
 const rootRouter = require('./routes/root');
