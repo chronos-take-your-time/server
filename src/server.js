@@ -1,5 +1,3 @@
-import { createClerkClient } from '@clerk/backend'
-
 // setup app
 const express = require('express');
 const app = express();
