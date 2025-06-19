@@ -24,7 +24,7 @@ if (!fs.existsSync(baseDir)) {
  * @param {Object} [boardData={}] - Data object to be saved as JSON
  * @returns {Object} - Status and message of the operation
  * @example
- * createBoard('team123', 'board456', { name: 'Sprint Planning', tasks: [] });
+ * createBoard('team123', 'board456', { name: 'jj' });
  */
 function createBoard(teamId, boardId, boardData = {}) {
   const teamPath = path.join(baseDir, teamId);
@@ -34,6 +34,24 @@ function createBoard(teamId, boardId, boardData = {}) {
   const boardPath = path.join(teamPath, `${boardId}.json`);
   fs.writeFileSync(boardPath, JSON.stringify(boardData, null, 2));
   return { status: 'success', message: `created at team@${teamId}`, resource: `board@${boardId}` };
+}
+
+/**
+ * Return a board JSON file
+ * @param {string} teamId - Team identifier
+ * @param {string} boardId - Unique board identifier
+ * @returns {Object} - Status and data of the board or error message
+ * @example
+ * getBoard('team123', 'board456');
+ */
+function getBoard(teamId, boardId) {
+  const boardPath = path.join(baseDir, teamId, `${boardId}.json`);
+  try {
+    const data = fs.readFileSync(boardPath, 'utf-8');
+    return { status: 'success', data: JSON.parse(data), resource: `board@${boardId}` };
+  } catch {
+    return { status: 'error', message: `not found or invalid JSON`, resource: `board@${boardId}` };
+  }
 }
 
 /**
@@ -55,5 +73,6 @@ function deleteBoard(teamId, boardId) {
 
 module.exports = {
   createBoard,
+  getBoard,
   deleteBoard
 };
