@@ -16,3 +16,6 @@ app.use('/boards', boardRouter);
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
 
 app.listen(port, () => { console.debug(`[SUCCESS]: Chronos listening on port ${port}`) });
+
+
+module.exports = clerkClient;
