@@ -5,9 +5,9 @@ const { handleResponse } = require('../utils/handleResponse');
 const { clerkClient } = require('@clerk/backend');
 
 /**
-* Check if an organization exists by its ID.
-* @param id - The organization ID to check.
-* @returns The organization object if it exists, or null if not.
+* Check if an organization exists by its id.
+* @param id - the organization id to check.
+* @returns the organization object if it exists, or null if not.
 */
 async function getOrganizationById(id) {
   try {
@@ -22,69 +22,152 @@ async function getOrganizationById(id) {
 }
 
 /**
-* Creates a directory structure for a pre-existing team in Clerk.
+* Check if a user exists by its id.
+* @param id - the user id to check.
+* @returns the user object if it exists, or null if not.
+*/
+async function getUserById(id) {
+  try {
+    const user = await clerkClient.users.getUser(id);
+    return user;
+  } catch (err) {
+    if (err?.errors?.[0]?.code === 'resource_not_found') {
+      return null;
+    }
+    throw err;
+  }
+}
+
+/**
+* Get a user's membership in an organization.
+* @param orgId - the organization id.
+* @param userId - the user id.
+* @returns the membership object if it exists, or null if not.
+*/
+async function getMembership(orgId, userId) {
+  const memberships = await clerkClient.organizations.getOrganizationMembershipList({
+    organizationId: orgId,
+    limit: 100,
+  });
+  return memberships.find(m => m.publicUserData?.userId === userId) || null;
+}
+
+/**
+* Creates a directory structure for a pre-existing team in clerk.
 *
-* @param {string} req.params.id - The unique identifier of the team in Clerk.
-* @param {Object} req.body - The request body containing additional team data.
-* @returns {Promise<Object>} The result of the directory creation process.
+* @param {string} req.params.id - the unique identifier of the team in clerk.
+* @param {object} req.body - the request body containing additional team data.
+* @returns {promise<object>} the result of the directory creation process.
 */
 router.post('/create/:id', (req, res) => {
   getOrganizationById(req.params.id)
     .then((org) => {
       if (!org) {
-        return res.status(404).json({ status: 'error', message: 'Organization not found', resource: `organization@${req.params.id}` });
+        return res.status(404).json({ status: 'error', message: 'organization not found', resource: `organization@${req.params.id}` });
       }
-
       const result = controller.createTeam(req.params.id, req.body);
       handleResponse(res, result);
-    })
+    });
 });
 
 /**
- * Retrieves the member IDs of an existing team.
- * @route GET /:team_id/
- * @param {string} req.params.team_id - The unique identifier of the team.
- * @returns {Array<string>} List of member IDs.
+ * Retrieves the member ids of an existing team.
+ * @route get /:team_id/
+ * @param {string} req.params.team_id - the unique identifier of the team.
+ * @returns {array<string>} list of member ids.
  */
-router.get('/:team_id/', async (req) => {
-    const memberships = await clerkClient.organizations.getOrganizationMembershipList({ organizationId: req.params.team_id, limit: 100 });
-
-    return memberships.map(member => member.publicUserData.userId);
+router.get('/:team_id/', async (req, res) => {
+  try {
+    const memberships = await clerkClient.organizations.getOrganizationMembershipList({
+      organizationId: req.params.team_id,
+      limit: 100
+    });
+    const ids = memberships.map(member => member.publicUserData?.userId);
+    handleResponse(res, ids);
+  } catch (err) {
+    handleResponse(res, { status: 'error', message: 'failed to get members', details: err.message }, 500);
   }
-);
-/**
- * Adds a user to an existing team by user ID.
- * @route POST /:team_id/add/:user_id
- * @param {string} req.params.team_id - The unique identifier of the team.
- * @param {string} req.params.user_id - The unique identifier of the user.
- * @returns {Object} Result of the add operation.
- */
-router.post('/:team_id/add/:user_id', (req, res) => {
-  const result = controller.addUser(req.params.team_id, req.params.user_id);
-  handleResponse(res, result);
 });
 
 /**
- * Removes a user from an existing team by user ID.
- * @route POST /:team_id/remove/:user_id
- * @param {string} req.params.team_id - The unique identifier of the team.
- * @param {string} req.params.user_id - The unique identifier of the user.
- * @returns {Object} Result of the remove operation.
+ * Adds a user to an existing team by user id.
+ * @route post /:team_id/add/:user_id
+ * @param {string} req.params.team_id - the unique identifier of the team.
+ * @param {string} req.params.user_id - the unique identifier of the user.
+ * @returns {object} result of the add operation.
  */
-router.post('/:team_id/remove/:user_id', (req, res) => {
-  const result = controller.removeUser(req.params.team_id, req.params.user_id);
-  handleResponse(res, result);
+router.post('/:team_id/add/:user_id', async (req, res) => {
+  const { team_id, user_id } = req.params;
+  try {
+    const [org, user] = await Promise.all([
+      getOrganizationById(team_id),
+      getUserById(user_id)
+    ]);
+    if (!org) return handleResponse(res, { success: false, message: 'team not found' }, 404);
+    if (!user) return handleResponse(res, { success: false, message: 'user not found' }, 404);
+
+    const membership = await getMembership(org.id, user.id);
+    if (membership) return handleResponse(res, { success: false, message: 'user already in team' }, 409);
+
+    await clerkClient.organizations.createOrganizationMembership({
+      organizationId: org.id,
+      userId: user.id,
+      role: 'basic_member'
+    });
+    handleResponse(res, { success: true, message: 'user added to team' });
+  } catch (err) {
+    handleResponse(res, { success: false, message: err.message }, 500);
+  }
 });
 
 /**
- * Deletes a team and all files in its directory.
- * @route DELETE /:team_id
- * @param {string} req.params.team_id - The unique identifier of the team.
- * @returns {Object} Result of the delete operation.
+ * Removes a user from an existing team by user id.
+ * @route post /:team_id/remove/:user_id
+ * @param {string} req.params.team_id - the unique identifier of the team.
+ * @param {string} req.params.user_id - the unique identifier of the user.
+ * @returns {object} result of the remove operation.
  */
-router.delete('/:team_id', (req, res) => {
-  const result = controller.deleteTeam(req.params.team_id);
-  handleResponse(res, result);
+router.post('/:team_id/remove/:user_id', async (req, res) => {
+  const { team_id, user_id } = req.params;
+  try {
+    const [org, user] = await Promise.all([
+      getOrganizationById(team_id),
+      getUserById(user_id)
+    ]);
+    if (!org) return handleResponse(res, { success: false, message: 'team not found' }, 404);
+    if (!user) return handleResponse(res, { success: false, message: 'user not found' }, 404);
+
+    const membership = await getMembership(org.id, user.id);
+    if (!membership) return handleResponse(res, { success: false, message: 'user is not a member of this team' }, 409);
+
+    await clerkClient.organizations.deleteOrganizationMembership(membership.id);
+    handleResponse(res, { success: true, message: 'user removed from team' });
+  } catch (err) {
+    handleResponse(res, { success: false, message: err.message }, 500);
+  }
+});
+
+/**
+ * Deletes a team in both clerk and your application, and all files in its directory.
+ * @route delete /:team_id
+ * @param {string} req.params.team_id - the unique identifier of the team.
+ * @returns {object} result of the delete operation.
+ */
+router.delete('/:team_id', async (req, res) => {
+  const teamId = req.params.team_id;
+  try {
+    // delete in clerk first (will throw if not exists)
+    await clerkClient.organizations.deleteOrganization(teamId);
+    // then delete in your own system
+    const result = await controller.deleteTeam(teamId);
+    handleResponse(res, { success: true, message: 'team deleted in clerk and app', ...result });
+  } catch (err) {
+    // if not found in clerk, 404
+    if (err?.errors?.[0]?.code === 'resource_not_found') {
+      return handleResponse(res, { success: false, message: 'team not found in clerk' }, 404);
+    }
+    handleResponse(res, { success: false, message: err.message }, 500);
+  }
 });
 
 module.exports = router;
