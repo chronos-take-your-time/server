@@ -16,8 +16,8 @@ Crie e preencha o arquivo `.env`, após isso rode o container com `docker-compos
   Retorna mensagem de status do servidor.
 
 ### Teams
-- **POST /teams/create/:user_id**  
-  Cria um novo time com o `user.id` como dono.
+- **POST /teams/create/:id**  
+  Cria um time no sistema com base do id deste time no clerk.
 
 - **GET /teams/:team_id/**  
   Retorna os membros do time.
