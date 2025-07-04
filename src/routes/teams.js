@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/teams');
-const { handleResponse } = require('../utils/handleResponse');
-const { clerkClient } = require('@clerk/backend');
+const handleResponse = require('../utils/handleResponse');
+const clerkClient = require('@clerk/backend');
 
 /**
 * Check if an organization exists by its id.
@@ -156,13 +156,10 @@ router.post('/:team_id/remove/:user_id', async (req, res) => {
 router.delete('/:team_id', async (req, res) => {
   const teamId = req.params.team_id;
   try {
-    // delete in clerk first (will throw if not exists)
     await clerkClient.organizations.deleteOrganization(teamId);
-    // then delete in your own system
     const result = await controller.deleteTeam(teamId);
     handleResponse(res, { success: true, message: 'team deleted in clerk and app', ...result });
   } catch (err) {
-    // if not found in clerk, 404
     if (err?.errors?.[0]?.code === 'resource_not_found') {
       return handleResponse(res, { success: false, message: 'team not found in clerk' }, 404);
     }
