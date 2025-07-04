@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/teams');
 const { handleResponse } = require('../utils/handleResponse');
-import { clerkClient } from 'clerk/backend';
+const { clerkClient } = require('@clerk/backend');
 
 /**
 * Check if an organization exists by its ID.

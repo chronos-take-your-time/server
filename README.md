@@ -10,7 +10,7 @@ Crie e preencha o arquivo `.env`, após isso rode o container com `docker-compos
 
 # Documentação da API
 
-## Rotas Principais
+## Endpoints
 ### Root
 - **GET /**  
   Retorna mensagem de status do servidor.
