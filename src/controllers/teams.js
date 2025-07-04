@@ -49,21 +49,7 @@ function deleteTeam(teamId) {
   return { status: 'error', message: `does not exists`, resource: `team@${teamId}` };
 }
 
-function addUser(teamId, userId) {
-  //TODO: implement logic to add a user to a team
-  return { status: 'success', message: `user ${userId} added to team ${teamId}`, resource: `team@${teamId}` };
-  // this is a placeholder implementation
-}
-
-function removeUser(teamId, userId) {
-  //TODO: implement logic to remove a user from a team
-  return { status: 'success', message: `user ${userId} removed from team ${teamId}`, resource: `team@${teamId}` };
-  // this is a placeholder implementation
-}
-
 module.exports = {
   createTeam,
   deleteTeam,
-  addUser,
-  removeUser
 };
