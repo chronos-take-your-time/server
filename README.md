@@ -22,10 +22,10 @@ Crie e preencha o arquivo `.env`, após isso rode o container com `docker-compos
 - **GET /teams/:team_id/**  
   Retorna os membros do time.
 
-- **POST /teams/:team_id/add/:user_id**  
+- **POST /teams/:team_id/:user_id**  
   Adiciona um usuário ao time.
 
-- **POST /teams/:team_id/remove/:user_id**  
+- **DELETE /teams/:team_id/:user_id**  
   Remove um usuário do time.
 
 - **DELETE /teams/:team_id**  

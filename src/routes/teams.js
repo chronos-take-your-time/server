@@ -91,12 +91,12 @@ router.get('/:team_id/', async (req, res) => {
 
 /**
  * Adds a user to an existing team by user id.
- * @route post /:team_id/add/:user_id
+ * @route post /:team_id/:user_id
  * @param {string} req.params.team_id - the unique identifier of the team.
  * @param {string} req.params.user_id - the unique identifier of the user.
  * @returns {object} result of the add operation.
  */
-router.post('/:team_id/add/:user_id', async (req, res) => {
+router.post('/:team_id/:user_id', async (req, res) => {
   const { team_id, user_id } = req.params;
   try {
     const [org, user] = await Promise.all([
@@ -122,12 +122,12 @@ router.post('/:team_id/add/:user_id', async (req, res) => {
 
 /**
  * Removes a user from an existing team by user id.
- * @route post /:team_id/remove/:user_id
+ * @route post /:team_id/:user_id
  * @param {string} req.params.team_id - the unique identifier of the team.
  * @param {string} req.params.user_id - the unique identifier of the user.
  * @returns {object} result of the remove operation.
  */
-router.post('/:team_id/remove/:user_id', async (req, res) => {
+router.delete('/:team_id/:user_id', async (req, res) => {
   const { team_id, user_id } = req.params;
   try {
     const [org, user] = await Promise.all([
