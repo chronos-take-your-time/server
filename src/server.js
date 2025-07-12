@@ -1,8 +1,9 @@
-// setup app
+require('dotenv').config();
+
 const express = require('express');
 const app = express();
 const port = 3000;
-const createClerkClient = require('@clerk/backend').createClerkClient;
+
 
 // routes
 const rootRouter = require('./routes/root');
@@ -12,10 +13,6 @@ app.use('/', rootRouter);
 app.use('/teams', teamRouter);
 app.use('/boards', boardRouter);
 
-// clerk
-const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
-
-app.listen(port, () => { console.debug(`[SUCCESS]: Chronos listening on port ${port}`) });
-
-
-module.exports = clerkClient;
+app.listen(port, () => {
+  console.debug(`[SUCCESS]: Chronos listening on port ${port}`);
+});

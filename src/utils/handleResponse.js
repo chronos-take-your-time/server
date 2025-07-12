@@ -20,4 +20,6 @@ function handleResponse(res, result) {
   return res.json({ message: result.message, resource: result.resource });
 }
 
-module.exports = handleResponse;
+module.exports = {
+  handleResponse
+};
