@@ -7,39 +7,9 @@ Crie e preencha o arquivo `.env`, após isso rode o container com `docker-compos
 > O script `./start.sh` é uma mais forma conveniente de executar a aplicação recriando seus containers do zero.
 
 ---
-
-# Documentação da API
-
-## Endpoints
-### Root
-- **GET /**  
-  Retorna mensagem de status do servidor.
-
-### Teams
-- **POST /teams/create/:id**  
-  Cria um time no sistema com base do id deste time no clerk.
-
-- **GET /teams/:team_id/**  
-  Retorna os membros do time.
-
-- **POST /teams/:team_id/:user_id**  
-  Adiciona um usuário ao time.
-
-- **DELETE /teams/:team_id/:user_id**  
-  Remove um usuário do time.
-
-- **DELETE /teams/:team_id**  
-  Remove um time e todos os seus quadros.
-
-### Boards
-- **POST /boards/:team_id/:id**  
-  Cria ou atualiza o conteúdo de um quadro.
-
-- **GET /boards/:team_id/:id**  
-  (A implementar) Retorna o JSON de um quadro.
-
-- **DELETE /boards/:team_id/:id**  
-  Remove um quadro.
+# Endpoints
+Com o [Bruno](https://www.usebruno.com/) podemos acessar a coleção de endpoints para este server de forma fácil. 
+[<img src="https://fetch.usebruno.com/button.svg" alt="Fetch no Cliente de API Bruno" style="width: 130px; height: 30px;" width="128" height="32">](https://fetch.usebruno.com?url=https://github.com/chronos-take-your-time/api-bruno.git "target=_blank rel=noopener noreferrer")
 
 ---
 
