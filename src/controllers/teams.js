@@ -26,6 +26,7 @@ if (!fs.existsSync(baseDir)) {
  */
 function createTeam(teamId) {
   const teamPath = path.join(baseDir, teamId);
+  // just create the teamPath if it already doesnt exists
   if (!fs.existsSync(teamPath)) {
     fs.mkdirSync(teamPath, { recursive: true });
     return { status: 'success', message: `created`, resource: `team@${teamId}` };
@@ -42,6 +43,8 @@ function createTeam(teamId) {
  */
 function deleteTeam(teamId) {
   const teamPath = path.join(baseDir, teamId);
+
+  // just delete a team that exists
   if (fs.existsSync(teamPath)) {
     fs.rmSync(teamPath, { recursive: true, force: true });
     return { status: 'success', message: `deleted`, resource: `team@${teamId}` };

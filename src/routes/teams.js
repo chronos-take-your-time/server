@@ -134,12 +134,14 @@ router.delete('/:team_id/:user_id', async (req, res) => {
       getOrganizationById(team_id),
       getUserById(user_id)
     ]);
+    const membership = await getMembership(org.id, user.id);
+
+    // verification before remove user from team
     if (!org) return handleResponse(res, { success: false, message: 'team not found' }, 404);
     if (!user) return handleResponse(res, { success: false, message: 'user not found' }, 404);
-
-    const membership = await getMembership(org.id, user.id);
     if (!membership) return handleResponse(res, { success: false, message: 'user is not a member of this team' }, 409);
 
+    // user is at team so we can delete him
     await clerkClient.organizations.deleteOrganizationMembership(membership.id);
     handleResponse(res, { success: true, message: 'user removed from team' });
   } catch (err) {
@@ -160,6 +162,7 @@ router.delete('/:team_id', async (req, res) => {
     const result = await controller.deleteTeam(teamId);
     handleResponse(res, { success: true, message: 'team deleted in clerk and app', ...result });
   } catch (err) {
+    // this will occurs when team isnt properly found like mistyped id 
     if (err?.errors?.[0]?.code === 'resource_not_found') {
       return handleResponse(res, { success: false, message: 'team not found in clerk' }, 404);
     }

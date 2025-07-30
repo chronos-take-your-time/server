@@ -27,13 +27,14 @@ if (!fs.existsSync(baseDir)) {
  * createBoard('team123', 'board456', { name: 'jj' });
  */
 function createBoard(teamId, boardId, boardData = {}) {
+  // verifing if team already exists by the path
   const teamPath = path.join(baseDir, teamId);
-  if (!fs.existsSync(teamPath)) {
-    return { status: 'error', message: `does not exist`, resource: `team@${teamId}` };
-  }
+  if (!fs.existsSync(teamPath)) { return { status: 'error', message: `does not exist`, resource: `team@${teamId}` }; }
+
+  // concat teamPath and boardId, writing a file with boardData
   const boardPath = path.join(teamPath, `${boardId}.json`);
   fs.writeFileSync(boardPath, JSON.stringify(boardData, null, 2));
-  return { status: 'success', message: `created at team@${teamId}`, resource: `board@${boardId}` };
+  return { status: 'success', message: `created at team@${teamId}`, resource: `board@${boardId}` }
 }
 
 /**
@@ -45,7 +46,10 @@ function createBoard(teamId, boardId, boardData = {}) {
  * getBoard('team123', 'board456');
  */
 function getBoard(teamId, boardId) {
+  // this is the supposed path
   const boardPath = path.join(baseDir, teamId, `${boardId}.json`);
+
+  // trying to read a file, if it fails return an error
   try {
     const data = fs.readFileSync(boardPath, 'utf-8');
     return { status: 'success', data: JSON.parse(data), resource: `board@${boardId}` };
