@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# THIS SCRIPT IS USED TO START THE SERVER PROPERLY, VERIFYING ENVIRONMENT AND DEPENDENCIES
+
 # ensure env file exists
 if [ ! -f .env ]; then
     echo "Error: .env file is missing. Please create it based on .env.example."
@@ -18,6 +20,13 @@ if ! command -v npm &> /dev/null; then
     exit 1
 fi
 
+# ensure user has docker installed
+if ! command -v docker &> /dev/null; then
+    echo "Error: Docker is not installed. Please install Docker before running this script."
+    exit 1
+fi
+
+# clean start the server
 docker compose down
 docker compose build --no-cache
 docker compose up
