@@ -5,7 +5,7 @@
   "description": "servidor para o chronos app",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node src/server.js",
     "dev": "nodemon src/server.js"
   },
@@ -21,6 +21,8 @@
     "path": "^0.12.7"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "jest": "^30.0.5",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.4"
   }
 }
