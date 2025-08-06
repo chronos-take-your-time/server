@@ -1,4 +1,4 @@
-# due the nature of this tests i need to figure out an way to connect to clerk, most part of this code is placeholder
+// due the nature of this tests i need to figure out an way to connect to clerk, most part of this code is placeholder
 
 const app = express();
 const request = require('supertest');
