@@ -39,8 +39,8 @@ describe('Boards Routes', () => {
       });
 
       await request(app)
-        .post('/boards/team123/board456')
-        .send({ name: 'Test Board' });
+      .post('/boards/team123/board456')
+      .send({ name: 'Test Board' });
 
       expect(controller.createBoard).toHaveBeenCalledWith('team123', 'board456', { name: 'Test Board' });
       expect(handleResponse).toHaveBeenCalledWith(expect.any(Object).success, err);
@@ -84,7 +84,7 @@ describe('Boards Routes', () => {
       });
 
       const response = await request(app)
-        .delete('/boards/team123/board456');
+      .delete('/boards/team123/board456');
 
       expect(controller.deleteBoard).toHaveBeenCalledWith('team123', 'board456');
       expect(handleResponse).toHaveBeenCalledWith(expect.any(Object).success, success);
@@ -97,7 +97,7 @@ describe('Boards Routes', () => {
       });
 
       await request(app)
-        .delete('/boards/team123/board456');
+      .delete('/boards/team123/board456');
 
       expect(controller.deleteBoard).toHaveBeenCalledWith('team123', 'board456');
       expect(handleResponse).toHaveBeenCalledWith(expect.any(Object).success, err);
