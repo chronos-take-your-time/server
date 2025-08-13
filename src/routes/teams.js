@@ -77,15 +77,15 @@ router.post('/create/:id', (req, res) => {
  * @returns {array<string>} list of member ids.
  */
 router.get('/:team_id/', async (req, res) => {
+  const teamId = req.params.team_id;
   try {
-    const memberships = await clerkClient.organizations.getOrganizationMembershipList({
-      organizationId: req.params.team_id,
-      limit: 100
-    });
-    const ids = memberships.map(member => member.publicUserData?.userId);
-    handleResponse(res, ids);
+    let members = await clerkClient.organizations.getOrganizationMembershipList({ organizationId : teamId });
+
+    // this will map members.data to only publicUserData.userId
+    const result = {status: 'success', message: members.data.length ? 'members found' : 'no members found', resource: members.data.map(m => m.publicUserData?.userId)}
+    handleResponse(res, result);
   } catch (err) {
-    handleResponse(res, { status: 'error', message: 'failed to get members', details: err.message }, 500);
+    handleResponse(res, { status: 'error', message: `failed to get members (${err.message})`, resource: `team@${teamId}` });
   }
 });
 
@@ -103,11 +103,11 @@ router.post('/:team_id/:user_id', async (req, res) => {
       getOrganizationById(team_id),
       getUserById(user_id)
     ]);
-    if (!org) return handleResponse(res, { status: false, message: 'team not found' }, 404);
-    if (!user) return handleResponse(res, { status: false, message: 'user not found' }, 404);
+    if (!org) return handleResponse(res, { status: false, message: 'team not found' });
+    if (!user) return handleResponse(res, { status: false, message: 'user not found' });
 
     const membership = await getMembership(org.id, user.id);
-    if (membership) return handleResponse(res, { status: false, message: 'user already in team' }, 409);
+    if (membership) return handleResponse(res, { status: false, message: 'user already in team' });
 
     await clerkClient.organizations.createOrganizationMembership({
       organizationId: org.id,
@@ -116,7 +116,7 @@ router.post('/:team_id/:user_id', async (req, res) => {
     });
     handleResponse(res, { status: true, message: 'user added to team' });
   } catch (err) {
-    handleResponse(res, { status: false, message: err.message }, 500);
+    handleResponse(res, { status: false, message: err.message });
   }
 });
 
@@ -137,15 +137,15 @@ router.delete('/:team_id/:user_id', async (req, res) => {
     const membership = await getMembership(org.id, user.id);
 
     // verification before remove user from team
-    if (!org) return handleResponse(res, { status: false, message: 'team not found' }, 404);
-    if (!user) return handleResponse(res, { status: false, message: 'user not found' }, 404);
-    if (!membership) return handleResponse(res, { status: false, message: 'user is not a member of this team' }, 409);
+    if (!org) return handleResponse(res, { status: false, message: 'team not found' });
+    if (!user) return handleResponse(res, { status: false, message: 'user not found' });
+    if (!membership) return handleResponse(res, { status: false, message: 'user is not a member of this team' });
 
     // user is at team so we can delete him
     await clerkClient.organizations.deleteOrganizationMembership(membership.id);
     handleResponse(res, { status: true, message: 'user removed from team' });
   } catch (err) {
-    handleResponse(res, { status: false, message: err.message }, 500);
+    handleResponse(res, { status: false, message: err.message });
   }
 });
 
@@ -164,9 +164,9 @@ router.delete('/:team_id', async (req, res) => {
   } catch (err) {
     // this will occurs when team isnt properly found like mistyped id 
     if (err?.errors?.[0]?.code === 'resource_not_found') {
-      return handleResponse(res, { status: false, message: 'team not found in clerk' }, 404);
+      return handleResponse(res, { status: false, message: 'team not found in clerk' });
     }
-    handleResponse(res, { status: false, message: err.message }, 500);
+    handleResponse(res, { status: false, message: err.message });
   }
 });
 
