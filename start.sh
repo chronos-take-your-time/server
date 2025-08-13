@@ -9,8 +9,12 @@ if [ ! -f .env ]; then
 fi
 
 # ensure api key is set in .env file
-if ! grep -q "API_KEY=" .env; then
-    echo "Error: API_KEY is missing in .env file. Please add your API key as specified in .env.example."
+if ! grep -q "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY" .env; then
+    echo "Error: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is missing in .env file. Please add your API key as specified in .env.example."
+    exit 1
+fi
+if ! grep -q "CLERK_SECRET_KEY" .env; then
+    echo "Error: CLERK_SECRET_KEY is missing in .env file. Please add your API key as specified in .env.example."
     exit 1
 fi
 
