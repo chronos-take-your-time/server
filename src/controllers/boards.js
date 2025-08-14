@@ -35,7 +35,7 @@ function createBoard(teamId, boardId, boardData) {
   humanOutput('info', `creating board...`, `team@${teamId} board@${boardId}`);
   
   const boardPath = path.join(teamPath, `${boardId}.json`);
-  fs.writeFileSync(boardPath, boardData);
+  fs.writeFileSync(boardPath, JSON.stringify(boardData === undefined ? {} : boardData, null, 2));
   return { status: 'success', message: `created at team@${teamId}`, resource: `board@${boardId}` }
 }
 
