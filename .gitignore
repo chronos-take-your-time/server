@@ -24,14 +24,10 @@ out/
 *.sublime-workspace
 *.sublime-project
 
-# os related
+# temp
 .DS_Store
 Thumbs.db
-
 yarn.lock
-
-
-# temp
 *.swp
 *.swo
 *.bak
@@ -40,3 +36,6 @@ yarn.lock
 *.pid
 *.seed
 *.pid.lock
+
+# teams folder
+src/teams/
