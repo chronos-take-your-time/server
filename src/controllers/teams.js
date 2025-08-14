@@ -44,12 +44,11 @@ function createTeam(teamId) {
 function deleteTeam(teamId) {
   const teamPath = path.join(baseDir, teamId);
 
-  // just delete a team that exists
+  // just delete a team path if it exists
   if (fs.existsSync(teamPath)) {
     fs.rmSync(teamPath, { recursive: true, force: true });
-    return { status: 'success', message: `deleted`, resource: `team@${teamId}` };
   }
-  return { status: 'error', message: `does not exists`, resource: `team@${teamId}` };
+  return { status: 'success', message: `deleted`, resource: `team@${teamId}` };
 }
 
 module.exports = {
