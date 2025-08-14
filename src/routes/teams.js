@@ -124,28 +124,34 @@ router.post('/:teamId/:userId', async (req, res) => {
 
 /**
  * Removes a user from an existing team by user id.
- * @route post /:team_id/:user_id
+ * @route delete /:team_id/:user_id
  * @param {string} req.params.team_id - the unique identifier of the team.
  * @param {string} req.params.user_id - the unique identifier of the user.
  * @returns {object} result of the remove operation.
  */
-router.delete('/:team_id/:user_id', async (req, res) => {
-  const { team_id, user_id } = req.params;
+router.delete('/:teamId/:userId', async (req, res) => {
+  const { teamId, userId } = req.params;
   try {
     const [org, user] = await Promise.all([
-      getOrganizationById(team_id),
-      getUserById(user_id)
+      getOrganizationById(teamId),
+      getUserById(userId)
     ]);
-    const membership = await getMembership(org.id, user.id);
 
     // verification before remove user from team
     if (!org) return handleResponse(res, { status: false, message: 'team not found' });
     if (!user) return handleResponse(res, { status: false, message: 'user not found' });
-    if (!membership) return handleResponse(res, { status: false, message: 'user is not a member of this team' });
 
+    const membership = await getMembership(teamId, userId);
+
+    if (!membership) return handleResponse(res, { status: false, message: 'user is not a member of this team' });
+    if (membership.role == 'org:owner') { return handleResponse(res, { status: 'error', message: 'cannot remove team owner', resource: `team@${teamId}` }) };
+    humanOutput('info', `Removing user@${userId} from team@${teamId}`);
     // user is at team so we can delete him
-    await clerkClient.organizations.deleteOrganizationMembership(membership.id);
-    handleResponse(res, { status: 'success', message: 'user removed from team' });
+    await clerkClient.organizations.deleteOrganizationMembership({
+      organizationId: teamId,
+      userId: userId
+    });
+    handleResponse(res, { status: 'success', message: 'user removed from team', resource: `team@${teamId}` });
   } catch (err) {
     handleResponse(res, { status: 'error', message: err.message });
   }
