@@ -1,36 +1,31 @@
 #!/bin/bash
 
-# THIS SCRIPT IS USED TO START THE SERVER PROPERLY, VERIFYING ENVIRONMENT AND DEPENDENCIES
+# Start the server, verifying environment and dependencies
+set -e
 
-# ensure env file exists
-if [ ! -f .env ]; then
-    echo "Error: .env file is missing. Please create it based on .env.example."
+# Check for .env file
+if [[ ! -f .env ]]; then
+    echo "Error: .env file is missing. Please create it based on .env.example." >&2
     exit 1
 fi
 
-# ensure api key is set in .env file
-if ! grep -q "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY" .env; then
-    echo "Error: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is missing in .env file. Please add your API key as specified in .env.example."
-    exit 1
-fi
-if ! grep -q "CLERK_SECRET_KEY" .env; then
-    echo "Error: CLERK_SECRET_KEY is missing in .env file. Please add your API key as specified in .env.example."
-    exit 1
-fi
+# Check required environment variables
+for var in NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY CLERK_SECRET_KEY; do
+    if ! grep -q "^$var=" .env; then
+        echo "Error: $var is missing in .env file. Please add it as specified in .env.example." >&2
+        exit 1
+    fi
+done
 
-# ensure user has npm installed
-if ! command -v npm &> /dev/null; then
-    echo "Error: npm is not installed. Please install npm before running this script."
-    exit 1
-fi
+# Check for required commands
+for cmd in npm docker; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        echo "Error: $cmd is not installed. Please install $cmd before running this script." >&2
+        exit 1
+    fi
+done
 
-# ensure user has docker installed
-if ! command -v docker &> /dev/null; then
-    echo "Error: Docker is not installed. Please install Docker before running this script."
-    exit 1
-fi
-
-# clean start the server
+# Clean start the server
 docker compose down
 docker compose build --no-cache
 docker compose up
