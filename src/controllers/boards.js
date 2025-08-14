@@ -6,6 +6,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { humanOutput } = require('../utils/output');
 
 /**
  * Directory where all teams data are stored
@@ -26,14 +27,15 @@ if (!fs.existsSync(baseDir)) {
  * @example
  * createBoard('team123', 'board456', { name: 'jj' });
  */
-function createBoard(teamId, boardId, boardData = {}) {
+function createBoard(teamId, boardId, boardData) {
   // verifing if team already exists by the path
   const teamPath = path.join(baseDir, teamId);
-  if (!fs.existsSync(teamPath)) { return { status: 'error', message: `does not exist`, resource: `team@${teamId}` }; }
+  if (!fs.existsSync(teamPath)) { return { status: 'error', message: `team path does not exist (consider create it)`, resource: `team@${teamId}` }; }
 
-  // concat teamPath and boardId, writing a file with boardData
+  humanOutput('info', `creating board...`, `team@${teamId} board@${boardId}`);
+  
   const boardPath = path.join(teamPath, `${boardId}.json`);
-  fs.writeFileSync(boardPath, JSON.stringify(boardData, null, 2));
+  fs.writeFileSync(boardPath, boardData);
   return { status: 'success', message: `created at team@${teamId}`, resource: `board@${boardId}` }
 }
 
