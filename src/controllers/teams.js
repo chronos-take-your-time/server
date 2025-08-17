@@ -45,9 +45,10 @@ function deleteTeam(teamId) {
   const teamPath = path.join(baseDir, teamId);
 
   // just delete a team path if it exists
-  if (fs.existsSync(teamPath)) {
-    fs.rmSync(teamPath, { recursive: true, force: true });
+  if (!fs.existsSync(teamPath)) {
+    return { status: 'error', message: `not found`, resource: `team@${teamId}` };
   }
+  fs.rmSync(teamPath, { recursive: true, force: true });
   return { status: 'success', message: `deleted`, resource: `team@${teamId}` };
 }
 
