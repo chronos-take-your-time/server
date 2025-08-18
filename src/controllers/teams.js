@@ -13,8 +13,14 @@ const path = require('path');
  */
 const baseDir = path.join(__dirname, '..', 'teams');
 
+// Create teams if it does not exists
 if (!fs.existsSync(baseDir)) {
   fs.mkdirSync(baseDir, { recursive: true });
+}
+
+// Helpers
+function getTeamPath(teamId) {
+  return path.join(baseDir, teamId)
 }
 
 /**
@@ -25,13 +31,15 @@ if (!fs.existsSync(baseDir)) {
  * createTeam('team123');
  */
 function createTeam(teamId) {
-  const teamPath = path.join(baseDir, teamId);
+  const teamPath = getTeamPath(teamId);
+
   // just create the teamPath if it already doesnt exists
-  if (!fs.existsSync(teamPath)) {
-    fs.mkdirSync(teamPath, { recursive: true });
-    return { status: 'success', message: `created`, resource: `team@${teamId}` };
+  if (fs.existsSync(teamPath)) {
+    return { status: 'error', message: `already exists`, resource: `team@${teamId}` };
   }
-  return { status: 'error', message: `already exists`, resource: `team@${teamId}` };
+  
+  fs.mkdirSync(teamPath, { recursive: true });
+  return { status: 'success', message: `created`, resource: `team@${teamId}` };
 }
 
 /**
@@ -42,14 +50,15 @@ function createTeam(teamId) {
  * deleteTeam('team123');
  */
 function deleteTeam(teamId) {
-  const teamPath = path.join(baseDir, teamId);
+  const teamPath = getTeamPath(teamId);
 
   // just delete a team that exists
-  if (fs.existsSync(teamPath)) {
-    fs.rmSync(teamPath, { recursive: true, force: true });
-    return { status: 'success', message: `deleted`, resource: `team@${teamId}` };
+  if (!fs.existsSync(teamPath)) {
+    return { status: 'error', message: `does not exists`, resource: `team@${teamId}` };
   }
-  return { status: 'error', message: `does not exists`, resource: `team@${teamId}` };
+
+  fs.rmSync(teamPath, { recursive: true, force: true });
+  return { status: 'success', message: `deleted`, resource: `team@${teamId}` };
 }
 
 module.exports = {
