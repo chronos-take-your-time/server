@@ -13,8 +13,14 @@ const path = require("path");
  */
 const baseDir = path.join(__dirname, "..", "teams");
 
+// Create teams if it does not exists
 if (!fs.existsSync(baseDir)) {
   fs.mkdirSync(baseDir, { recursive: true });
+}
+
+// Helpers
+function getTeamPath(teamId, altDir = baseDir) {
+  return path.join(altDir, teamId);
 }
 
 /**
@@ -27,8 +33,7 @@ if (!fs.existsSync(baseDir)) {
  * createTeam('team123', '/tmp/test-dir');
  */
 function createTeam(teamId, customBaseDir) {
-  const root = customBaseDir || baseDir;
-  const teamPath = path.join(root, teamId);
+  const teamPath = getTeamPath(teamId, customBaseDir);
 
   if (!fs.existsSync(teamPath)) {
     fs.mkdirSync(teamPath, { recursive: true });
@@ -56,23 +61,34 @@ function createTeam(teamId, customBaseDir) {
  * deleteTeam('team123', '/tmp/test-dir');
  */
 function deleteTeam(teamId, customBaseDir) {
-  const root = customBaseDir || baseDir;
-  const teamPath = path.join(root, teamId);
+  const teamPath = getTeamPath(teamId, customBaseDir);
 
+  // just delete a team that exists
   if (!fs.existsSync(teamPath)) {
-    return {
-      status: "error",
-      message: "not found",
-      resource: `team@${teamId}`,
-    };
+    return { status: 'error', message: `does not exists`, resource: `team@${teamId}` };
   }
 
   fs.rmSync(teamPath, { recursive: true, force: true });
-  return {
-    status: "success",
-    message: "deleted",
-    resource: `team@${teamId}`,
-  };
+  return { status: 'success', message: `deleted`, resource: `team@${teamId}` };
+}
+
+/**
+ * Lists all boards in a team directory
+ * @param {string} teamId - Team identifier
+ * @param {string} [customBaseDir] - Optional base directory (mainly for testing)
+ * @returns {Array<Object>} - List of boards with their IDs
+ */
+function getTeamBoards(teamId, customBaseDir) {
+  const teamPath = getTeamPath(teamId, customBaseDir);
+
+  if (!fs.existsSync(teamPath)) {
+    return { status: 'error', message: `does not exists`, resource: `team@${teamId}` };
+  }
+
+  const files = fs.readdirSync(teamPath);
+  return files
+    .filter(file => file.endsWith('.json'))
+    .map(file => ({ boardId: path.basename(file, '.json') }));
 }
 
 module.exports = {
