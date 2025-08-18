@@ -4,14 +4,14 @@
  * @see {@link https://chronos-take-your-time.github.io/wiki/arquitetura/servidor/dados/} for details
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 /**
- * Directory where all teams data are stored
+ * Default directory where all teams data are stored
  * @constant {string}
  */
-const baseDir = path.join(__dirname, '..', 'teams');
+const baseDir = path.join(__dirname, "..", "teams");
 
 // Create teams if it does not exists
 if (!fs.existsSync(baseDir)) {
@@ -19,38 +19,49 @@ if (!fs.existsSync(baseDir)) {
 }
 
 // Helpers
-function getTeamPath(teamId) {
-  return path.join(baseDir, teamId)
+function getTeamPath(teamId, altDir = baseDir) {
+  return path.join(altDir, teamId);
 }
 
 /**
  * Creates a new team directory
  * @param {string} teamId - Unique team identifier
+ * @param {string} [customBaseDir] - Optional base directory (mainly for testing)
  * @returns {Object} - Status and message of the operation
  * @example
  * createTeam('team123');
+ * createTeam('team123', '/tmp/test-dir');
  */
-function createTeam(teamId) {
-  const teamPath = getTeamPath(teamId);
+function createTeam(teamId, customBaseDir) {
+  const teamPath = getTeamPath(teamId, customBaseDir);
 
-  // just create the teamPath if it already doesnt exists
-  if (fs.existsSync(teamPath)) {
-    return { status: 'error', message: `already exists`, resource: `team@${teamId}` };
+  if (!fs.existsSync(teamPath)) {
+    fs.mkdirSync(teamPath, { recursive: true });
+    return {
+      status: "success",
+      message: "created",
+      resource: `team@${teamId}`,
+    };
   }
 
-  fs.mkdirSync(teamPath, { recursive: true });
-  return { status: 'success', message: `created`, resource: `team@${teamId}` };
+  return {
+    status: "error",
+    message: "already exists",
+    resource: `team@${teamId}`,
+  };
 }
 
 /**
  * Recursively deletes a team directory with all its boards
  * @param {string} teamId - Team identifier
+ * @param {string} [customBaseDir] - Optional base directory (mainly for testing)
  * @returns {Object} - Status and message of the operation
  * @example
  * deleteTeam('team123');
+ * deleteTeam('team123', '/tmp/test-dir');
  */
-function deleteTeam(teamId) {
-  const teamPath = getTeamPath(teamId);
+function deleteTeam(teamId, customBaseDir) {
+  const teamPath = getTeamPath(teamId, customBaseDir);
 
   // just delete a team that exists
   if (!fs.existsSync(teamPath)) {
@@ -61,21 +72,23 @@ function deleteTeam(teamId) {
   return { status: 'success', message: `deleted`, resource: `team@${teamId}` };
 }
 
-function getTeamBoards(teamId) {
-  const teamPath = getTeamPath(teamId);
+/**
+ * Lists all boards in a team directory
+ * @param {string} teamId - Team identifier
+ * @param {string} [customBaseDir] - Optional base directory (mainly for testing)
+ * @returns {Array<Object>} - List of boards with their IDs
+ */
+function getTeamBoards(teamId, customBaseDir) {
+  const teamPath = getTeamPath(teamId, customBaseDir);
 
   if (!fs.existsSync(teamPath)) {
     return { status: 'error', message: `does not exists`, resource: `team@${teamId}` };
   }
 
-  // ensure that only .json files are included
   const files = fs.readdirSync(teamPath);
-  const teamBoards = files.filter(file => file.endsWith('.json')).map(file => {
-    const boardId = path.basename(file, '.json');
-    return { boardId: boardId };
-  });
-
-  return teamBoards;
+  return files
+    .filter(file => file.endsWith('.json'))
+    .map(file => ({ boardId: path.basename(file, '.json') }));
 }
 
 module.exports = {

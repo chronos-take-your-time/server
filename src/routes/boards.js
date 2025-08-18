@@ -5,7 +5,7 @@ const { handleResponse } = require('../utils/handleResponse');
 
 // create/update a existing board
 router.post('/:team_id/:id', (req, res) => {
-  const result = controller.createBoard(req.params.team_id, req.params.id, req.body);
+  const result = controller.createBoard(req.params.team_id, req.params.id, JSON.stringify(req.body));
   handleResponse(res, result);
 });
 
