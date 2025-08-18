@@ -37,7 +37,7 @@ function createTeam(teamId) {
   if (fs.existsSync(teamPath)) {
     return { status: 'error', message: `already exists`, resource: `team@${teamId}` };
   }
-  
+
   fs.mkdirSync(teamPath, { recursive: true });
   return { status: 'success', message: `created`, resource: `team@${teamId}` };
 }
@@ -59,6 +59,23 @@ function deleteTeam(teamId) {
 
   fs.rmSync(teamPath, { recursive: true, force: true });
   return { status: 'success', message: `deleted`, resource: `team@${teamId}` };
+}
+
+function getTeamBoards(teamId) {
+  const teamPath = getTeamPath(teamId);
+
+  if (!fs.existsSync(teamPath)) {
+    return { status: 'error', message: `does not exists`, resource: `team@${teamId}` };
+  }
+
+  // ensure that only .json files are included
+  const files = fs.readdirSync(teamPath);
+  const teamBoards = files.filter(file => file.endsWith('.json')).map(file => {
+    const boardId = path.basename(file, '.json');
+    return { boardId: boardId };
+  });
+
+  return teamBoards;
 }
 
 module.exports = {
