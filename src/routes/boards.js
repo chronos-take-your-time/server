@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/boards');
-const { handleResponse } = require('../utils/handleResponse');
+const { handleResponse } = require('../utils/output');
 
 // create/update a existing board
 router.post('/:team_id/:id', (req, res) => {

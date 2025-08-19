@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/teams');
-const { handleResponse } = require('../utils/handleResponse');
 const clerkClient = require('../utils/clerk');
-const { humanOutput } = require('../utils/output');
+const { humanOutput, handleResponse } = require('../utils/output');
 
 /**
 * Check if an organization exists by its id.
