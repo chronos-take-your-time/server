@@ -12,14 +12,14 @@
     "vscode": {
       "settings": {
         "editor.wordWrap": "on",
-        "editor.fontSize": 14,
+        "editor.fontSize": 12,
         "editor.tabSize": 2,
         "files.autoSave": "afterDelay"
       },
       "extensions": [
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "orta.vscode-jest",
+        "orta.vscode-jest"
       ]
     }
   },
