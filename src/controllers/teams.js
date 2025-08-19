@@ -94,4 +94,5 @@ function getTeamBoards(teamId, customBaseDir) {
 module.exports = {
   createTeam,
   deleteTeam,
+  getTeamBoards
 };
