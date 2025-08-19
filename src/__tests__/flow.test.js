@@ -3,8 +3,8 @@ const os = require('os');
 const path = require('path');
 
 const { getRandomBoardId } = require('../utils/random');
-const { createTeam, deleteTeam, getTeamBoards } = require('../controllers/teams');
-const { createBoard, getBoard, deleteBoard } = require('../controllers/boards');
+const { createTeam, deleteTeam } = require('../controllers/teams');
+const { createBoard, getBoard, deleteBoard, getTeamBoards } = require('../controllers/boards');
 
 let tmpDir;
 const fakeTeamId = 'org@test';
@@ -13,7 +13,7 @@ const fakeBoardData = { ishow: 'speed' };
 
 // Helpers
 function setupBoard(boardId = fakeBoardId) {
-  createBoard(fakeTeamId, boardId, fakeBoardData, tmpDir);
+  return createBoard(fakeTeamId, boardId, fakeBoardData, tmpDir);
 }
 
 beforeEach(() => {

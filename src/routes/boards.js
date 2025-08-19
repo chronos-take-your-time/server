@@ -21,4 +21,10 @@ router.delete('/:team_id/:id', (req, res) => {
   handleResponse(res, result);
 });
 
+// get all boards id from a team
+router.get('/:team_id', (req, res) => {
+  const result = controller.getTeamBoards(req.params.team_id);
+  handleResponse(res, result);
+});
+
 module.exports = router;

@@ -116,8 +116,29 @@ function deleteBoard(teamId, boardId, customBaseDir) {
   };
 }
 
+/**
+ * Lists all boards in a team directory
+ * @param {string} teamId - Team identifier
+ * @param {string} [customBaseDir] - Optional base directory (mainly for testing)
+ * @returns {Array<Object>} - List of boards with their IDs
+ */
+function getTeamBoards(teamId, customBaseDir) {
+  const root = customBaseDir || baseDir;
+  const teamPath = path.join(root, teamId);
+
+  if (!fs.existsSync(teamPath)) {
+    return { status: 'error', message: `does not exists`, resource: `team@${teamId}` };
+  }
+
+  const files = fs.readdirSync(teamPath);
+  return files
+    .filter(file => file.endsWith('.json'))
+    .map(file => ({ boardId: path.basename(file, '.json') }));
+}
+
 module.exports = {
   createBoard,
   getBoard,
   deleteBoard,
+  getTeamBoards
 };

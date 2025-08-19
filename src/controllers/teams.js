@@ -72,27 +72,7 @@ function deleteTeam(teamId, customBaseDir) {
   return { status: 'success', message: `deleted`, resource: `team@${teamId}` };
 }
 
-/**
- * Lists all boards in a team directory
- * @param {string} teamId - Team identifier
- * @param {string} [customBaseDir] - Optional base directory (mainly for testing)
- * @returns {Array<Object>} - List of boards with their IDs
- */
-function getTeamBoards(teamId, customBaseDir) {
-  const teamPath = getTeamPath(teamId, customBaseDir);
-
-  if (!fs.existsSync(teamPath)) {
-    return { status: 'error', message: `does not exists`, resource: `team@${teamId}` };
-  }
-
-  const files = fs.readdirSync(teamPath);
-  return files
-    .filter(file => file.endsWith('.json'))
-    .map(file => ({ boardId: path.basename(file, '.json') }));
-}
-
 module.exports = {
   createTeam,
   deleteTeam,
-  getTeamBoards
 };
