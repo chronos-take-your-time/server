@@ -68,6 +68,10 @@ describe('Board Controller', () => {
     setupBoard();
     setupBoard(altBoardId);
     const result = getTeamBoards(fakeTeamId, tmpDir);
-    expect(result).toStrictEqual([{boardId: fakeBoardId}, {boardId: altBoardId}])
+    const expected = [{ boardId: fakeBoardId }, { boardId: altBoardId }];
+
+    // sort to prevent false negatives due to order
+    const sortById = arr => arr.sort((a, b) => a.boardId.localeCompare(b.boardId));
+    expect(sortById(result)).toStrictEqual(sortById(expected));
   });
 });
