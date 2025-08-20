@@ -8,38 +8,14 @@ Crie e preencha o arquivo `.env`, após isso rode o container com `docker-compos
 
 > O script `./start.sh` é uma mais forma conveniente de executar a aplicação recriando seus containers do zero.
 
----
 # Endpoints
-A documentação dos endpoints está disponível em [chronos.apidog.io](chronos.apidog.io), além disso, usando o [Bruno API Client](https://www.usebruno.com/) é possível acessar a coleção de endpoints para este server de forma fácil.[<img src="https://fetch.usebruno.com/button.svg" alt="Fetch no Cliente de API Bruno" style="width: 130px; height: 30px;" width="128" height="32">](https://fetch.usebruno.com?url=https://github.com/chronos-take-your-time/api-bruno.git "target=_blank rel=noopener noreferrer")
+A documentação dos endpoints está disponível em [chronos.apidog.io](chronos.apidog.io), caso prefira, acesse a [Documentação alternativa nos padrões OpenAPI ou Postman](https://github.com/chronos-take-your-time/open-api/)
 
----
+## Routes
+As *routes* essencialmente mapeiam os *controllers*, sendo como uma camada de contato que pode ser usada como reforço de segurança sanitizando e controlando o acesso.
 
 ## Controllers
 O *controller* é um arquivo que contém implementações para a infraestrutura por baixo das rotas, operando, por exemplo, no sistema de arquivos, seja criando diretórios ou arquivos.
 
 - [`src/controllers/teams.js`](src/controllers/teams.js): Gerencia criação e remoção de times.
 - [`src/controllers/boards.js`](src/controllers/boards.js): Gerencia criação e remoção de boards.
-
----
-
-## Exemplos de uso
-
-### Criar um time
-```bash
-curl -X POST http://localhost:3000/teams/create/123
-```
-
-### Adicionar usuário ao time
-```bash
-curl -X POST http://localhost:3000/teams/abc/add/456
-```
-
-### Criar um board
-```bash
-curl -X POST -H "Content-Type: application/json" -d '{ "Hello, i am a JSON (Joaquim Standart Object Notation)" }' http://localhost:3000/boards/123/789
-```
-
-### Remover um board
-```bash
-curl -X DELETE http://localhost:3000/boards/123/789
-```
