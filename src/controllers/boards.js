@@ -7,12 +7,7 @@
 const fs = require("fs");
 const path = require("path");
 const { humanOutput } = require("../utils/output");
-
-/**
- * Default directory where all teams data are stored
- * @constant {string}
- */
-const baseDir = path.join(__dirname, "..", "teams");
+const { baseDir, getTeamPath } = require("../controllers/helper");
 
 if (!fs.existsSync(baseDir)) {
   fs.mkdirSync(baseDir, { recursive: true });
@@ -30,8 +25,7 @@ if (!fs.existsSync(baseDir)) {
  * createBoard('team123', 'board456', { name: 'jj' }, '/tmp/test-dir');
  */
 function createBoard(teamId, boardId, boardData, customBaseDir) {
-  const root = customBaseDir || baseDir;
-  const teamPath = path.join(root, teamId);
+  const teamPath = getTeamPath(teamId, customBaseDir);
 
   if (!fs.existsSync(teamPath)) {
     return {

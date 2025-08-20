@@ -3,10 +3,6 @@ const { humanOutput } = require("../utils/output");
 const baseDir = path.join(__dirname, "..", "teams");
 
 function getTeamPath(teamId, altDir = baseDir) {
-  if (altDir) {
-    altDir = baseDir;
-  }
-
   if (!teamId) {
     return humanOutput("error", "getTeamPath called without teamId");
   }

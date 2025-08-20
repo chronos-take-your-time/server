@@ -3,24 +3,12 @@
  * @description Handles operations for team creation, deletion, and management.
  * @see {@link https://chronos-take-your-time.github.io/wiki/arquitetura/servidor/dados/} for details
  */
-
+const { baseDir, getTeamPath } = require("../controllers/helper");
 const fs = require("fs");
-const path = require("path");
-
-/**
- * Default directory where all teams data are stored
- * @constant {string}
- */
-const baseDir = path.join(__dirname, "..", "teams");
 
 // Create teams if it does not exists
 if (!fs.existsSync(baseDir)) {
   fs.mkdirSync(baseDir, { recursive: true });
-}
-
-// Helpers
-function getTeamPath(teamId, altDir = baseDir) {
-  return path.join(altDir, teamId);
 }
 
 /**
