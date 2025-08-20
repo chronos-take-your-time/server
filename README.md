@@ -10,8 +10,7 @@ Crie e preencha o arquivo `.env`, após isso rode o container com `docker-compos
 
 ---
 # Endpoints
-Com o [Bruno](https://www.usebruno.com/) podemos acessar a coleção de endpoints para este server de forma fácil. 
-[<img src="https://fetch.usebruno.com/button.svg" alt="Fetch no Cliente de API Bruno" style="width: 130px; height: 30px;" width="128" height="32">](https://fetch.usebruno.com?url=https://github.com/chronos-take-your-time/api-bruno.git "target=_blank rel=noopener noreferrer")
+A documentação dos endpoints está disponível em [chronos.apidog.io](chronos.apidog.io), além disso, usando o [Bruno API Client](https://www.usebruno.com/) é possível acessar a coleção de endpoints para este server de forma fácil.[<img src="https://fetch.usebruno.com/button.svg" alt="Fetch no Cliente de API Bruno" style="width: 130px; height: 30px;" width="128" height="32">](https://fetch.usebruno.com?url=https://github.com/chronos-take-your-time/api-bruno.git "target=_blank rel=noopener noreferrer")
 
 ---
 
