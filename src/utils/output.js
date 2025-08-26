@@ -25,12 +25,17 @@ function humanOutput(type, message, entity="") {
  * @param {*} result.resource - The resource to include in the response.
  * @returns {object} The response sent to the client.
  */
-function handleResponse(res, result) {
+function handleResponse(res, result, code=undefined) {
   humanOutput(result.status, result.message, result.resource);
-  if (result.status != 'success') {
-    return res.status(400).json({ error: result.message, resource: result.resource });
+
+  // Handle cases without specific HTTP status code
+  if (code == undefined) {
+    if (result.status != 'success') {
+      return res.status(400).json({ error: result.message, resource: result.resource });
+    }
+    return res.json({ message: result.message, resource: result.resource });
   }
-  return res.json({ message: result.message, resource: result.resource });
+  return res.status(code).json({ message: result.message, resource: result.resource });
 }
 
 module.exports = {
