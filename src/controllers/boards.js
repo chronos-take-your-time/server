@@ -29,13 +29,11 @@ function createBoard(teamId, boardId, boardData, customBaseDir) {
 
   if (!fs.existsSync(teamPath)) {
     return {
-      status: "error",
+      status: 400,
       message: "team path does not exist (consider create it)",
       resource: `team@${teamId}`,
     };
   }
-
-  humanOutput("info", "creating board...", `team@${teamId} board@${boardId}`);
 
   const boardPath = path.join(teamPath, `${boardId}.json`);
   fs.writeFileSync(
@@ -44,7 +42,7 @@ function createBoard(teamId, boardId, boardData, customBaseDir) {
   );
 
   return {
-    status: "success",
+    status: 201,
     message: `created at team@${teamId}`,
     resource: `board@${boardId}`,
   };
@@ -67,13 +65,13 @@ function getBoard(teamId, boardId, customBaseDir) {
   try {
     const data = fs.readFileSync(boardPath, "utf-8");
     return {
-      status: "success",
+      status: 202,
       data: JSON.parse(data),
       resource: `board@${boardId}`,
     };
   } catch {
     return {
-      status: "error",
+      status: 400,
       message: "not found or invalid JSON",
       resource: `board@${boardId}`,
     };
@@ -97,14 +95,14 @@ function deleteBoard(teamId, boardId, customBaseDir) {
   if (fs.existsSync(boardPath)) {
     fs.unlinkSync(boardPath);
     return {
-      status: "success",
+      status: 202,
       message: `deleted at team@${teamId}`,
       resource: `board@${boardId}`,
     };
   }
 
   return {
-    status: "error",
+    status: 400,
     message: `does not exists at team@${teamId}`,
     resource: `board@${boardId}`,
   };
@@ -121,7 +119,7 @@ function getTeamBoards(teamId, customBaseDir) {
   const teamPath = path.join(root, teamId);
 
   if (!fs.existsSync(teamPath)) {
-    return { status: 'error', message: `does not exists`, resource: `team@${teamId}` };
+    return { status: 400, message: `does not exists`, resource: `team@${teamId}` };
   }
 
   const files = fs.readdirSync(teamPath);

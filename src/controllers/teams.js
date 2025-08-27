@@ -26,14 +26,14 @@ function createTeam(teamId, customBaseDir) {
   if (!fs.existsSync(teamPath)) {
     fs.mkdirSync(teamPath, { recursive: true });
     return {
-      status: "success",
+      status: 201,
       message: "created",
       resource: `team@${teamId}`,
     };
   }
 
   return {
-    status: "error",
+    status: 400,
     message: "already exists",
     resource: `team@${teamId}`,
   };
@@ -53,11 +53,11 @@ function deleteTeam(teamId, customBaseDir) {
 
   // just delete a team that exists
   if (!fs.existsSync(teamPath)) {
-    return { status: 'error', message: `does not exists`, resource: `team@${teamId}` };
+    return { status: 400, message: `does not exists`, resource: `team@${teamId}` };
   }
 
   fs.rmSync(teamPath, { recursive: true, force: true });
-  return { status: 'success', message: `deleted`, resource: `team@${teamId}` };
+  return { status: 202, message: `deleted`, resource: `team@${teamId}` };
 }
 
 module.exports = {
