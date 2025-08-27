@@ -18,7 +18,7 @@ for var in NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY CLERK_SECRET_KEY; do
 done
 
 # Check for required commands
-for cmd in npm docker; do
+for cmd in docker; do
     if ! command -v "$cmd" >/dev/null 2>&1; then
         echo "Error: $cmd is not installed. Please install $cmd before running this script." >&2
         exit 1
