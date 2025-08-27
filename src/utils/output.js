@@ -7,8 +7,9 @@
 function humanOutput(type, message, entity="") {
   // Define prefixes for different message types based in HTTP status codes and standard types
   const prefixes = {
-    200: "[SUCCESS]",
+    200: "[OK]",
     201: "[CREATED]",
+    201: "[ACCEPTED]",
     204: "[NO CONTENT]",
     400: "[BAD REQUEST]",
     401: "[UNAUTHORIZED]",
