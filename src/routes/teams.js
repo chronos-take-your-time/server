@@ -2,35 +2,24 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/teams');
 const clerkClient = require('../utils/clerk');
-const { humanOutput, handleResponse } = require('../utils/output');
+const handleResponse = require('../utils/output');
 
 /**
-* Check if an organization exists by its id.
-* @param id - the organization id to check.
-* @returns the organization object if it exists, or null if not.
+* Check if a user or team exists by its id.
+* @param id - the entity id to check.
+* @param type - the entity type in clerk ('user' or 'team').
+* @returns the entity id if it exists, or error if not.
 */
-async function getOrganizationById(id) {
+async function getById(id, type) {
   try {
-    const org = await clerkClient.organizations.getOrganization({ organizationId: id });
-    return org;
+    const ent = (type == 'user') ? await clerkClient.users.getUser(id) : await clerkClient.organizations.getOrganization({ organizationId: id });
+    return ent;
   } catch (err) {
-    return handleResponse(res, { status: 400, message: 'team not found' });
+    const message = (type == 'user') ? 'user not found' : 'organization not found';
+    return handleResponse(res, { status: 400, message });
   }
 }
 
-/**
-* Check if a user exists by its id.
-* @param id - the user id to check.
-* @returns the user object if it exists, or null if not.
-*/
-async function getUserById(id) {
-  try {
-    const user = await clerkClient.users.getUser(id);
-    return user;
-  } catch (err) {
-    return handleResponse(res, { status: 400, message: 'user not found' });
-  }
-}
 
 /**
 * Get a user's membership in an organization.
@@ -51,7 +40,7 @@ async function getMembership(teamId, userId) {
 * @returns {promise<object>} the result of the directory creation process.
 */
 router.post('/create/:id', (req, res) => {
-  getOrganizationById(req.params.id)
+  getById(req.params.id, 'team')
     .then((org) => {
       if (!org) {
         return handleResponse(res, { status: 400, message: 'organization not found', resource: `organization@${req.params.id}` });
@@ -91,13 +80,8 @@ router.post('/:teamId/:userId', async (req, res) => {
   const { teamId, userId } = req.params;
   
   try {
-    const [org, user] = await Promise.all([
-      getOrganizationById(teamId),
-      getUserById(userId)
-    ]);
-
     // check if user is already in team
-    const membership = await getMembership(org.id, user.id);
+    const membership = await getMembership(teamId, userId);
     if (membership) return handleResponse(res, { status: 202, message: 'user already in team', resource: `team@${teamId}` });
 
     await clerkClient.organizations.createOrganizationMembership({
@@ -106,7 +90,7 @@ router.post('/:teamId/:userId', async (req, res) => {
       role: 'org:member'
     });
 
-    handleResponse(res, { status: 200, message: 'user added to team', resource: `team@${teamId}` });
+    handleResponse(res, { status: 202, message: 'user added to team', resource: `team@${teamId}` });
   } catch (err) {
     handleResponse(res, { status: 400, message: err.message, resource: `team@${teamId}` });
   }
@@ -122,11 +106,6 @@ router.post('/:teamId/:userId', async (req, res) => {
 router.delete('/:teamId/:userId', async (req, res) => {
   const { teamId, userId } = req.params;
   try {
-    const [org, user] = await Promise.all([
-      getOrganizationById(teamId),
-      getUserById(userId)
-    ]);
-
     // check if user is in team
     const membership = await getMembership(teamId, userId);
     if (!membership) return handleResponse(res, { status: 400, message: 'user is not a member of this team' });
@@ -138,7 +117,7 @@ router.delete('/:teamId/:userId', async (req, res) => {
       organizationId: teamId,
       userId: userId
     });
-    handleResponse(res, { status: 200, message: 'user removed from team', resource: `team@${teamId}` });
+    handleResponse(res, { status: 202, message: 'user removed from team', resource: `team@${teamId}` });
   } catch (err) {
     handleResponse(res, { status: 400, message: err.message });
   }
@@ -154,14 +133,14 @@ router.delete('/:team_id', async (req, res) => {
   const teamId = req.params.team_id;
   try {
     await clerkClient.organizations.deleteOrganization(teamId);
-    const result = await controller.deleteTeam(teamId);
-    handleResponse(res, { status: '200', message: 'team deleted in clerk and app' });
+    await controller.deleteTeam(teamId);
+    handleResponse(res, { status: 202, message: 'team deleted in clerk and app' });
   } catch (err) {
     // this will occurs when team isnt properly found like mistyped id 
     if (err?.errors?.[0]?.code === 'resource_not_found') {
-      return handleResponse(res, { status: '400', message: 'team not found in clerk' });
+      return handleResponse(res, { status: 400, message: 'team not found in clerk' });
     }
-    handleResponse(res, { status: '400', message: err.message });
+    handleResponse(res, { status: 400, message: err.message });
   }
 });
 
