@@ -5,10 +5,22 @@
  * @param {string} [entity] - Optional entity identifier (e.g., "team@123")
  */
 function humanOutput(type, message, entity="") {
+  // Define prefixes for different message types based in HTTP status codes and standard types
   const prefixes = {
+    200: "[OK]",
+    201: "[CREATED]",
+    201: "[ACCEPTED]",
+    204: "[NO CONTENT]",
+    400: "[BAD REQUEST]",
+    401: "[UNAUTHORIZED]",
+    403: "[FORBIDDEN]",
+    404: "[NOT FOUND]",
+    409: "[CONFLICT]",
+    422: "[UNPROCESSABLE]",
+    500: "[SERVER ERROR]",
+    info: "[INFO]",
     success: "[SUCCESS]",
-    error: "[ERROR]",
-    info: "[INFO]"
+    error: "[ERROR]"
   };
 
   const entityPart = entity ? `${entity} ` : '';
@@ -25,17 +37,9 @@ function humanOutput(type, message, entity="") {
  * @param {*} result.resource - The resource to include in the response.
  * @returns {object} The response sent to the client.
  */
-function handleResponse(res, result, code=undefined) {
+function handleResponse(res, result) {
   humanOutput(result.status, result.message, result.resource);
-
-  // Handle cases without specific HTTP status code
-  if (code == undefined) {
-    if (result.status != 'success') {
-      return res.status(400).json({ error: result.message, resource: result.resource });
-    }
-    return res.json({ message: result.message, resource: result.resource });
-  }
-  return res.status(code).json({ message: result.message, resource: result.resource });
+  return res.status(result.status).json({ message: result.message, resource: result.resource });
 }
 
 module.exports = {
