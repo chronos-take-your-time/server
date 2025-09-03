@@ -122,9 +122,9 @@ function getTeamBoards(teamId, customBaseDir) {
   }
 
   const files = fs.readdirSync(teamPath);
-  return files
-    .filter(file => file.endsWith('.json'))
-    .map(file => ({ boardId: path.basename(file, '.json') }));
+  const boards = files.filter(file => file.endsWith('.json')).map(file => ({ boardId: path.basename(file, '.json') }));
+
+  return { status: 200, data: boards, resource: `team@${teamId}` };
 }
 
 module.exports = {
