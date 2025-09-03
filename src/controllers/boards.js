@@ -6,7 +6,6 @@
 
 const fs = require("fs");
 const path = require("path");
-const { humanOutput } = require("../utils/output");
 const { baseDir, getTeamPath } = require("../controllers/helper");
 
 if (!fs.existsSync(baseDir)) {
