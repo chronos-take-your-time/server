@@ -5,6 +5,21 @@ const { handleResponse } = require('../utils/output');
 const { memberOnly } = require('../utils/clerk');
 
 /**
+* Helper with the base structure for these routes
+*
+* @param {string} req - Requisition object.
+* @param {string} res - Response object.
+* @param {Object} action - A function to be executed.
+* @returns {Promise<Object>} The result of the operation.
+*/
+async function routeHelper(req, res, action, admin=false) {
+  const { userId } = req.auth;
+  memberOnly(userId, teamId, admin)
+  const result = action;
+  handleResponse(res, result);
+}
+
+/**
 * Create a new board for the specified team and board ID.
 *
 * @param {string} req.params.team_id - The ID of the team to which the board belongs.
@@ -13,10 +28,10 @@ const { memberOnly } = require('../utils/clerk');
 * @returns {Promise<Object>} The result of the board creation operation.
 */
 router.post('/:team_id/:id', async (req, res) => {
-  const { userId } = req.auth;
-  memberOnly(userId, teamId)
-  const result = controller.createBoard(req.params.team_id, req.params.id, JSON.stringify(req.body));
-  handleResponse(res, result);
+  const teamId = req.params.team_id;
+  const boardId = req.params.id;
+  const boardData = JSON.stringify(req.body);
+  routeHelper(req, res, controller.createBoard(teamId, boardId, boardData));
 });
 
 /**
@@ -25,13 +40,12 @@ router.post('/:team_id/:id', async (req, res) => {
 * @param {string} req.params.team_id - The ID of the team to which the board belongs.
 * @param {string} req.params.id - The ID for the new board.
 * @param {Object} req.body - The request body containing board details, which will be stringified.
-* @returns {Promise<Object>} The result of the board creation operation.
+* @returns {Promise<Object>} The result of the board return operation.
 */
 router.get('/:team_id/:id', async (req, res) => {
-  const { userId } = req.auth;
-  memberOnly(userId, teamId)
-  const result = controller.getBoard(req.params.team_id, req.params.id);
-  handleResponse(res, result);
+  const teamId = req.params.team_id;
+  const boardId = req.params.id;
+  routeHelper(req, res, controller.getBoard(teamId, boardId));
 });
 
 /**
@@ -42,10 +56,9 @@ router.get('/:team_id/:id', async (req, res) => {
 * @returns {Promise<Object>} The result of the board deletion operation.
 */
 router.delete('/:team_id/:id', async (req, res) => {
-  const { userId } = req.auth;
-  memberOnly(userId, teamId, true);
-  const result = controller.deleteBoard(req.params.team_id, req.params.id);
-  handleResponse(res, result);
+  const teamId = req.params.team_id;
+  const boardId = req.params.id;
+  routeHelper(req, res, controller.createBoard(teamId, boardId), true);
 });
 
 /**
@@ -55,10 +68,8 @@ router.delete('/:team_id/:id', async (req, res) => {
 * @returns {Promise<Object>} The result containing the list of boards for the specified team.
 */
 router.get('/:team_id', async (req, res) => {
-  const { userId } = req.auth;
-  memberOnly(userId, teamId);
-  const result = controller.getTeamBoards(req.params.team_id);
-  handleResponse(res, result);
+  const teamId = req.params.team_id;
+  routeHelper(req, res, controller.getTeamBoards(teamId));
 });
 
 module.exports = router;
