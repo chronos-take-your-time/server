@@ -59,9 +59,28 @@ async function getMembership(teamId, userId) {
     return members.data.find(m => m.publicUserData?.userId === userId) || null;
 }
 
+/**
+ * Helper to protect routes for team member or admin actions
+ *
+ * @async
+ * @param {string} userId - Unique identifier of the user.
+ * @param {string} teamId - Unique identifier of the team.
+ * @returns {Promise<Object>} The result of the board creation operation.
+ */
+async function memberOnly(userId, teamId, isAdmin=false) {
+    if (isAdmin && !(await isUserTeam(userId, teamId))) {
+      return handleResponse(res, { status: 403, message: 'forbidden: only team admins can perform this action', resource: `organization@${teamId}` });
+    }
+  
+    if (!isAdmin && !(await isUserTeam(userId, teamId, 'org:member'))) {
+      return handleResponse(res, { status: 403, message: 'forbidden: only team members can perform this action', resource: `organization@${teamId}` });
+    }
+}
+
 module.exports = {
     clerkClient,
     getMembership,
     isUserTeam,
-    getById
+    getById,
+    memberOnly
 };

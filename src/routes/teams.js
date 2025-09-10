@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/teams');
 const { handleResponse } = require('../utils/output');
-const { clerkClient, getMembership, isUserTeam, getById } = require('../utils/clerk');
+const { clerkClient, getMembership, isUserTeam, getById, memberOnly } = require('../utils/clerk');
 
 /**
  * Creates application-level resources for a pre-existing Clerk team.
@@ -18,9 +18,7 @@ router.post('/create/:id', async (req, res) => {
     const org = await getById(teamId, 'team');
     if (!org) return handleResponse(res, { status: 400, message: 'bad request: organization not found', resource: `organization@${teamId}` });
 
-    if (!(await isUserTeam(userId, teamId))) {
-      return handleResponse(res, { status: 403, message: 'forbidden: only team admins can perform this action', resource: `organization@${teamId}` });
-    }
+    memberOnly(userId, teamId, true);
 
     const result = await controller.createTeam(teamId, req.body);
     handleResponse(res, result);
@@ -40,18 +38,19 @@ router.get('/:teamId/', async (req, res) => {
   const teamId = req.params.teamId;
 
   try {
-    if (!(await isUserTeam(userId, teamId, 'org:member'))) {
-      return handleResponse(res, { status: 403, message: 'forbidden: only team members can perform this action', resource: `organization@${teamId}` });
-    }
+    memberOnly(userId, teamId);
 
+    // get members of an organizations and map then into an object, if there is no one return a proper message
     const members = await clerkClient.organizations.getOrganizationMembershipList({ organizationId: teamId });
     const ids = members.data.map(m => m.publicUserData?.userId);
+    const message = 'success: members' + members.data.length ? 'found' : 'not found';
 
     handleResponse(res, {
       status: 200,
-      message: members.data.length ? 'success: members found' : 'success: no members found',
+      message: message,
       resource: ids,
     });
+    
   } catch (err) {
     handleResponse(res, { status: 400, message: `bad request: failed to get members (${err.message})`, resource: `team@${teamId}` });
   }
@@ -68,9 +67,7 @@ router.post('/:teamId/:userId', async (req, res) => {
   const { userId } = req.auth;
 
   try {
-    if (!(await isUserTeam(userId, teamId))) {
-      return handleResponse(res, { status: 403, message: 'forbidden: only team admins can perform this action', resource: `organization@${teamId}` });
-    }
+    memberOnly(userId, teamId, true);
 
     const membership = await getMembership(teamId, userIdAdding);
     if (membership) return handleResponse(res, { status: 202, message: 'success: user already in team', resource: `team@${teamId}` });
@@ -96,9 +93,7 @@ router.delete('/:teamId/:userId', async (req, res) => {
     const membership = await getMembership(teamId, userIdRemoving);
     if (!membership) return handleResponse(res, { status: 400, message: 'bad request: user is not a member of this team', resource: `team@${teamId}` });
 
-    if (!(await isUserTeam(userId, teamId))) {
-      return handleResponse(res, { status: 403, message: 'forbidden: only team admins can perform this action', resource: `organization@${teamId}` });
-    }
+    memberOnly(userId, teamId, true);
 
     if (membership.role === 'org:owner') {
       return handleResponse(res, { status: 400, message: 'bad request: cannot remove team owner', resource: `team@${teamId}` });
@@ -122,9 +117,7 @@ router.delete('/:team_id', async (req, res) => {
   const { userId } = req.auth;
 
   try {
-    if (!(await isUserTeam(userId, teamId))) {
-      return handleResponse(res, { status: 403, message: 'forbidden: only team admins can perform this action', resource: `organization@${teamId}` });
-    }
+    memberOnly(userId, teamId, true);
 
     await clerkClient.organizations.deleteOrganization(teamId);
     await controller.deleteTeam(teamId);
