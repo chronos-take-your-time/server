@@ -1,23 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/boards');
-const { handleResponse } = require('../utils/output');
-const { memberOnly } = require('../utils/clerk');
-
-/**
-* Helper with the base structure for these routes
-*
-* @param {string} req - Requisition object.
-* @param {string} res - Response object.
-* @param {Object} action - A function to be executed.
-* @returns {Promise<Object>} The result of the operation.
-*/
-async function routeHelper(req, res, action, admin=false) {
-  const { userId } = req.auth;
-  memberOnly(userId, teamId, admin)
-  const result = action;
-  handleResponse(res, result);
-}
+const { routeHelper } = require('../utils/routeHelper');
 
 /**
 * Create a new board for the specified team and board ID.
