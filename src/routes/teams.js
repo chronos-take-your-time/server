@@ -17,7 +17,7 @@ router.post('/create/:id', async (req, res) => {
       const { teamId } = req.params;
       const org = await getById(teamId, 'team');
       if (!org) return handleResponse(res, { status: 400, message: 'bad request: organization not found', resource: `organization@${teamId}` });
-      const result = await controller.createTeam(teamId, req.body);
+      const result = await controller.createTeam(teamId);
       handleResponse(res, result);
     } catch (err) {
       handleResponse(res, { status: 500, message: 'internal server error', resource: err.message });

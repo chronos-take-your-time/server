@@ -1,5 +1,5 @@
 const { handleResponse } = require('./output');
-const { memberOnly } = require('./output');
+const { memberOnly } = require('./clerk');
 
 /**
 * Helper with the base structure for these routes
@@ -11,15 +11,14 @@ const { memberOnly } = require('./output');
 */
 async function routeHelper(req, res, action, admin=false) {
   try {
-    req.auth;
+    const { userId } = req.auth;
+    const { teamId } = req.params;
+    await memberOnly(userId, teamId, admin);
+    const result = action;
+    handleResponse(res, result);
   } catch (err) {
     handleResponse(res, { status: 401, message: 'unauthorized without clerk session', resource: err.message });
   }
-  const { userId } = req.auth;
-  const { teamId } = req.params;
-  memberOnly(userId, teamId, admin);
-  const result = action;
-  handleResponse(res, result);
 }
 
 module.exports = {

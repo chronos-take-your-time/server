@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config({ path: '../../.env' });
 const { clerkAuthMiddleware } = require('./utils/clerk');
 
 const express = require('express');
