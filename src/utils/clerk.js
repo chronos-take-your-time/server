@@ -79,31 +79,10 @@ async function memberOnly(userId, teamId, isAdmin=false) {
     }
 }
 
-async function clerkAuthMiddleware(req, res, next) {
-    const token = req.headers.authorization?.split(' ')[1];
-
-    if (!token) {
-        return handleResponse(res, { status: 401, message: 'forbidden: only authenticated users can perform this action' });
-    }
-
-    try {
-        const authContext = await clerkClient.authenticateRequest({
-            headers: req.headers,
-        });
-
-        if (authContext.is && authContext.userId) { 
-            req.auth = { userId: authContext.userId };
-            next();
-        } else {
-            return handleResponse(res, { 
-                status: 401, 
-                message: 'unauthorized: invalid or expired session',
-                resource: authContext.reason,
-            });
-        }
-    } catch (err) {
-        return handleResponse(res, { status: 401, message: 'token expired', resource: err.message });
-    }
+async function withAuth(req, next) {
+    const { userId } = req.auth;
+    req.auth = userId ? auth : {};
+    next();
 }
 
 module.exports = {
@@ -112,5 +91,5 @@ module.exports = {
     isUserTeam,
     getById,
     memberOnly,
-    clerkAuthMiddleware
+    withAuth
 };
