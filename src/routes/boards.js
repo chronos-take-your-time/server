@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/boards');
-const { handleResponse } = require('../utils/output');
+const { routeHelper } = require('../utils/routeHelper');
 
 /**
 * Create a new board for the specified team and board ID.
@@ -11,9 +11,11 @@ const { handleResponse } = require('../utils/output');
 * @param {Object} req.body - The request body containing board details, which will be stringified.
 * @returns {Promise<Object>} The result of the board creation operation.
 */
-router.post('/:team_id/:id', (req, res) => {
-  const result = controller.createBoard(req.params.team_id, req.params.id, JSON.stringify(req.body));
-  handleResponse(res, result);
+router.post('/:team_id/:id', async (req, res) => {
+  const teamId = req.params.team_id;
+  const boardId = req.params.id;
+  const boardData = JSON.stringify(req.body);
+  routeHelper(req, res, controller.createBoard(teamId, boardId, boardData));
 });
 
 /**
@@ -22,11 +24,12 @@ router.post('/:team_id/:id', (req, res) => {
 * @param {string} req.params.team_id - The ID of the team to which the board belongs.
 * @param {string} req.params.id - The ID for the new board.
 * @param {Object} req.body - The request body containing board details, which will be stringified.
-* @returns {Promise<Object>} The result of the board creation operation.
+* @returns {Promise<Object>} The result of the board return operation.
 */
-router.get('/:team_id/:id', (req, res) => {
-  const result = controller.getBoard(req.params.team_id, req.params.id);
-  handleResponse(res, result);
+router.get('/:team_id/:id', async (req, res) => {
+  const teamId = req.params.team_id;
+  const boardId = req.params.id;
+  routeHelper(req, res, controller.getBoard(teamId, boardId));
 });
 
 /**
@@ -36,9 +39,10 @@ router.get('/:team_id/:id', (req, res) => {
 * @param {string} req.params.id - The ID of the board to delete.
 * @returns {Promise<Object>} The result of the board deletion operation.
 */
-router.delete('/:team_id/:id', (req, res) => {
-  const result = controller.deleteBoard(req.params.team_id, req.params.id);
-  handleResponse(res, result);
+router.delete('/:team_id/:id', async (req, res) => {
+  const teamId = req.params.team_id;
+  const boardId = req.params.id;
+  routeHelper(req, res, controller.createBoard(teamId, boardId), true);
 });
 
 /**
@@ -47,9 +51,9 @@ router.delete('/:team_id/:id', (req, res) => {
 * @param {string} req.params.team_id - The ID of the team for which to retrieve boards.
 * @returns {Promise<Object>} The result containing the list of boards for the specified team.
 */
-router.get('/:team_id', (req, res) => {
-  const result = controller.getTeamBoards(req.params.team_id);
-  handleResponse(res, result);
+router.get('/:team_id', async (req, res) => {
+  const teamId = req.params.team_id;
+  routeHelper(req, res, controller.getTeamBoards(teamId));
 });
 
 module.exports = router;

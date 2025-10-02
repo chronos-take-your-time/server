@@ -10,7 +10,7 @@ if [[ ! -f .env ]]; then
 fi
 
 # Check required environment variables
-for var in NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY CLERK_SECRET_KEY; do
+for var in CLERK_SECRET_KEY; do
     if ! grep -q "^$var=" .env; then
         echo "Error: $var is missing in .env file. Please add it as specified in .env.example." >&2
         exit 1
