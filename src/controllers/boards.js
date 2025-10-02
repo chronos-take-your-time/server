@@ -37,7 +37,7 @@ function createBoard(teamId, boardId, boardData, customBaseDir) {
   const boardPath = path.join(teamPath, `${boardId}.json`);
   fs.writeFileSync(
     boardPath,
-    JSON.stringify(boardData === undefined ? {} : boardData, null, 2)
+    boardData === undefined ? JSON.stringify({}) : boardData, null, 2
   );
 
   return {
@@ -122,7 +122,8 @@ function getTeamBoards(teamId, customBaseDir) {
   }
 
   const files = fs.readdirSync(teamPath);
-  const boards = files.filter(file => file.endsWith('.json')).map(file => ({ boardId: path.basename(file, '.json') }));
+  const boards = files.filter(file => file.endsWith('.json')).map(file => ({ boardId: path.basename(file, '.json'), data: getBoard(teamId, path.basename(file, '.json')).data}));
+
 
   return { status: 200, data: boards, resource: `team@${teamId}` };
 }
