@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const { routeHelper } = require('../utils/routeHelper');
+const { handleResponse } = require('../utils/output');
 
 router.get('/', (req, res) => {
-  res.status(200).send({
-    message: `chronos is running at 3000`,
+  routeHelper(req, res, () => {
+    handleResponse(res, { status: 200, message: 'chronos is running at 3000' });
   })
 })
 

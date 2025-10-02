@@ -71,19 +71,31 @@ async function getMembership(teamId, userId) {
  */
 async function memberOnly(userId, teamId, isAdmin=false) {
     if (isAdmin && !(await isUserTeam(userId, teamId))) {
-      return handleResponse(res, { status: 403, message: 'forbidden: only team admins can perform this action', resource: `organization@${teamId}` });
+        return handleResponse(res, { status: 403, message: 'forbidden: only team admins can perform this action', resource: `organization@${teamId}` });
     }
   
     if (!isAdmin && !(await isUserTeam(userId, teamId, 'org:member'))) {
-      return handleResponse(res, { status: 403, message: 'forbidden: only team members can perform this action', resource: `organization@${teamId}` });
+        return handleResponse(res, { status: 403, message: 'forbidden: only team members can perform this action', resource: `organization@${teamId}` });
     }
 }
 
-async function withAuth(req, next) {
-    const { userId } = req.auth;
-    req.auth = userId ? auth : {};
-    next();
-}
+// middleware for authenticated context
+const withAuth = () => {
+    return async (req, res, next) => {
+        try {
+            const { userId } = req.auth;
+            
+            if (!userId) {
+                handleResponse(res, { status: 401, message: 'unauthorized without clerk session' });
+                return;
+            }
+            next();
+
+        } catch (err) {
+            handleResponse(res, { status: 500, message: 'server error' });
+        }
+    };
+};
 
 module.exports = {
     clerkClient,

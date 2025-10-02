@@ -12,12 +12,16 @@ const { memberOnly } = require('./clerk');
 async function routeHelper(req, res, action, admin=false) {
   try {
     const { userId } = req.auth;
-    const { teamId } = req.params;
-    await memberOnly(userId, teamId, admin);
-    const result = action;
-    handleResponse(res, result);
+    const teamId = req.params.teamId ? req.params.teamId : 'empty';
+
+    // if the routes needs user to be in the team
+    if (teamId != "empty") {
+      await memberOnly(userId, teamId, admin);
+    }
+    
+    return action();
   } catch (err) {
-    handleResponse(res, { status: 401, message: 'unauthorized without clerk session', resource: err.message });
+    handleResponse(res, { status: 401, message: 'unauthorized', resource: err.message });
   }
 }
 
