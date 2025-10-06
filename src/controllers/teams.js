@@ -6,7 +6,7 @@
 const { baseDir, getTeamPath } = require("../controllers/helper");
 const fs = require("fs");
 
-// Create teams if it does not exists
+// create teams if it does not exists
 if (!fs.existsSync(baseDir)) {
   fs.mkdirSync(baseDir, { recursive: true });
 }
@@ -32,11 +32,7 @@ function createTeam(teamId, customBaseDir) {
     };
   }
 
-  return {
-    status: 400,
-    message: "already exists",
-    resource: `team@${teamId}`,
-  };
+  return { status: 400, message: "already exists", resource: `team@${teamId}`};
 }
 
 /**

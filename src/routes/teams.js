@@ -3,7 +3,7 @@ const router = express.Router();
 const controller = require('../controllers/teams');
 const { handleResponse } = require('../utils/output');
 const { routeHelper } = require('../utils/routeHelper');
-const { clerkClient, getMembership, getById } = require('../utils/clerk');
+const { clerkClient, getMembership } = require('../utils/clerk');
 
 /**
  * Creates application-level resources for a pre-existing Clerk team.
@@ -90,10 +90,10 @@ router.delete('/:teamId/:userId', async (req, res) => {
   const { teamId, userId: userIdRemoving } = req.params;
   routeHelper(req, res, async () => {
     try {
-      const { teamId } = req.params
       // ensure user is in team, otherwise return
       const membership = await getMembership(teamId, userIdRemoving);
       if (!membership) return handleResponse(res, { status: 400, message: 'bad request: user is not a member of this team', resource: `team@${teamId}` });
+
       // cannot remove admin
       if (membership.role == 'org:admin') {
         return handleResponse(res, { status: 400, message: 'bad request: cannot remove team admin', resource: `team@${teamId}` });
@@ -101,9 +101,9 @@ router.delete('/:teamId/:userId', async (req, res) => {
 
       // removing user
       await clerkClient.organizations.deleteOrganizationMembership({ organizationId: teamId, userId: userIdRemoving });
-      handleResponse(res, { status: 202, message: 'success: user removed from team', resource: `team@${teamId}` });
+      handleResponse({ status: 202, message: 'success: user removed from team', resource: `team@${teamId}` });
     } catch (err) {
-      handleResponse(res, { status: 400, message: `bad request: ${err.message}` });
+      handleResponse({ status: 400, message: `bad request: [${err.message}]` });
     }
   }, true);
 });
@@ -125,7 +125,7 @@ router.delete('/:teamId', async (req, res) => {
       if (err?.errors?.[0]?.code === 'resource_not_found') {
         return handleResponse(res, { status: 400, message: 'bad request: team not found in clerk' });
       }
-      handleResponse(res, { status: 400, message: `bad request: ${err.message}` });
+      handleResponse(res, { status: 400, message: `bad request: [${err.message}]` });
     }
   }, true);
 });

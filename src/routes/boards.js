@@ -15,13 +15,11 @@ const { handleResponse } = require('../utils/output');
 router.post('/:team_id/:id', async (req, res) => {
   const teamId = req.params.team_id;
   const boardId = req.params.id;
-
   const boardData = JSON.stringify(req.body);
   
   routeHelper(req, res, ()=>{
     const result = controller.createBoard(teamId, boardId, boardData);
-
-    handleResponse(res, result)
+    handleResponse(result)
   });
 });
 
@@ -36,10 +34,10 @@ router.post('/:team_id/:id', async (req, res) => {
 router.get('/:team_id/:id', async (req, res) => {
   const teamId = req.params.team_id;
   const boardId = req.params.id;
+
   routeHelper(req, res, ()=>{ 
     const result = controller.getBoard(teamId, boardId);
-
-    handleResponse(res, result);
+    handleResponse(result);
   });
 });
 
@@ -53,9 +51,9 @@ router.get('/:team_id/:id', async (req, res) => {
 router.delete('/:team_id/:id', async (req, res) => {
   const teamId = req.params.team_id;
   const boardId = req.params.id;
+
   routeHelper(req, res, ()=>{ 
     const result = controller.deleteBoard(teamId, boardId);
-
     handleResponse(res, result);
   }, true);
 });
@@ -70,7 +68,6 @@ router.get('/:teamId', async (req, res) => {
   routeHelper(req, res, ()=>{
     const {teamId} = {...req.params}
     const result = controller.getTeamBoards(teamId);
-
     handleResponse(res, result);
   });
 });

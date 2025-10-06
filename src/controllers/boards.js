@@ -26,6 +26,7 @@ if (!fs.existsSync(baseDir)) {
 function createBoard(teamId, boardId, boardData, customBaseDir) {
   const teamPath = getTeamPath(teamId, customBaseDir);
 
+  // if teampath does not exists
   if (!fs.existsSync(teamPath)) {
     return {
       status: 400,
@@ -34,10 +35,11 @@ function createBoard(teamId, boardId, boardData, customBaseDir) {
     };
   }
 
+  // write file inside teamPath
   const boardPath = path.join(teamPath, `${boardId}.json`);
   fs.writeFileSync(
     boardPath,
-    boardData === undefined ? JSON.stringify({}) : boardData, null, 2
+    boardData === undefined ? JSON.stringify({}) : boardData, null, 2 // if there is no data write an empty json
   );
 
   return {
@@ -102,8 +104,8 @@ function deleteBoard(teamId, boardId, customBaseDir) {
 
   return {
     status: 400,
-    message: `does not exists at team@${teamId}`,
-    resource: `board@${boardId}`,
+    message: `board does not exist`,
+    resource: `team@${teamId}.board@${boardId}`,
   };
 }
 
@@ -118,7 +120,7 @@ function getTeamBoards(teamId, customBaseDir) {
   const teamPath = path.join(root, teamId);
 
   if (!fs.existsSync(teamPath)) {
-    return { status: 400, message: `does not exists`, resource: `team@${teamId}` };
+    return { status: 400, message: `board does not exist`, resource: `team@${teamId}` };
   }
 
   const files = fs.readdirSync(teamPath);

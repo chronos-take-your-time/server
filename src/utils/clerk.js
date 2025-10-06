@@ -19,8 +19,9 @@ async function getById(id, type) {
         ? await clerkClient.users.getUser(id)
         : await clerkClient.organizations.getOrganization({ organizationId: id });
         return ent;
-    } catch (err) {
-        throw new Error(type === 'user' ? 'user not found' : 'organization not found');
+    } catch {
+        const message = type === 'user' ? 'user not found' : 'organization not found';
+        return handleResponse({ status: 404, message: message });
     }
 }
 
@@ -71,11 +72,11 @@ async function getMembership(teamId, userId) {
  */
 async function memberOnly(userId, teamId, isAdmin=false) {
     if (isAdmin && !(await isUserTeam(userId, teamId))) {
-        return handleResponse(res, { status: 403, message: 'forbidden: only team admins can perform this action', resource: `organization@${teamId}` });
+        return handleResponse({ status: 403, message: 'forbidden: only team admins can perform this action', resource: `organization@${teamId}` });
     }
   
     if (!isAdmin && !(await isUserTeam(userId, teamId, 'org:member'))) {
-        return handleResponse(res, { status: 403, message: 'forbidden: only team members can perform this action', resource: `organization@${teamId}` });
+        return handleResponse({ status: 403, message: 'forbidden: only team members can perform this action', resource: `organization@${teamId}` });
     }
 }
 
@@ -86,13 +87,13 @@ const withAuth = () => {
             const { userId } = req.auth;
             
             if (!userId) {
-                handleResponse(res, { status: 401, message: 'unauthorized without clerk session' });
+                handleResponse({ status: 401, message: 'unauthorized without clerk session' });
                 return;
             }
             next();
 
-        } catch (err) {
-            handleResponse(res, { status: 500, message: 'server error' });
+        } catch {
+            handleResponse({ status: 500, message: 'server error' });
         }
     };
 };

@@ -8,7 +8,6 @@ function humanOutput(type, message, entity="") {
   // Define prefixes for different message types based in HTTP status codes and standard types
   const prefixes = {
     200: "[OK]",
-    201: "[CREATED]",
     201: "[ACCEPTED]",
     204: "[NO CONTENT]",
     400: "[BAD REQUEST]",
@@ -30,22 +29,20 @@ function humanOutput(type, message, entity="") {
 /**
  * Handles the HTTP response by sending a JSON response based on the result status using humanOutput.
  *
- * @param {object} res - The Express response object.
  * @param {object} result - The result object containing status, message, and resource.
  * @param {string} result.status - The status of the operation ('success' or other).
  * @param {string} result.message - The message to send in the response.
  * @param {*} result.resource - The resource to include in the response.
  * @returns {object} The response sent to the client.
  */
-function handleResponse(res, result) {
+function handleResponse(result) {
   humanOutput(result.status, result.message, result.resource);
-  return res
-    .status(result.status)
-    .json({
-      message: result.message,
-      data: result.data,
-      resource: result.resource,
-    });
+  const payload = {
+    ...(result.message && { message: result.message }),
+    ...(result.data && { data: result.data }),
+    ...(result.resource && { resource: result.resource }),
+  };
+  return { status: result.status, payload };
 }
 
 module.exports = {
