@@ -19,7 +19,9 @@ router.post('/:team_id/:id', async (req, res) => {
   
   routeHelper(req, res, ()=>{
     const result = controller.createBoard(teamId, boardId, boardData);
-    handleResponse(result)
+    const response = handleResponse(result);
+
+    res.status(response.status).json(response.payload);
   });
 });
 
@@ -37,7 +39,9 @@ router.get('/:team_id/:id', async (req, res) => {
 
   routeHelper(req, res, ()=>{ 
     const result = controller.getBoard(teamId, boardId);
-    handleResponse(result);
+    const response = handleResponse(result);
+
+    res.status(response.status).json(response.payload);
   });
 });
 
@@ -54,7 +58,9 @@ router.delete('/:team_id/:id', async (req, res) => {
 
   routeHelper(req, res, ()=>{ 
     const result = controller.deleteBoard(teamId, boardId);
-    handleResponse(res, result);
+    const response = handleResponse(result);
+
+    res.status(response.status).json(response.payload);
   }, true);
 });
 
@@ -68,7 +74,9 @@ router.get('/:teamId', async (req, res) => {
   routeHelper(req, res, ()=>{
     const {teamId} = {...req.params}
     const result = controller.getTeamBoards(teamId);
-    handleResponse(res, result);
+    const response = handleResponse(result);
+
+    res.status(response.status).json(response.payload);
   });
 });
 
