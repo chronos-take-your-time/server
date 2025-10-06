@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/boards');
 const { routeHelper } = require('../utils/routeHelper');
+const { handleResponse } = require('../utils/output');
 
 /**
 * Create a new board for the specified team and board ID.
@@ -14,8 +15,14 @@ const { routeHelper } = require('../utils/routeHelper');
 router.post('/:team_id/:id', async (req, res) => {
   const teamId = req.params.team_id;
   const boardId = req.params.id;
+
   const boardData = JSON.stringify(req.body);
-  routeHelper(req, res, controller.createBoard(teamId, boardId, boardData));
+  
+  routeHelper(req, res, ()=>{
+    const result = controller.createBoard(teamId, boardId, boardData);
+
+    handleResponse(res, result)
+  });
 });
 
 /**
@@ -29,7 +36,11 @@ router.post('/:team_id/:id', async (req, res) => {
 router.get('/:team_id/:id', async (req, res) => {
   const teamId = req.params.team_id;
   const boardId = req.params.id;
-  routeHelper(req, res, controller.getBoard(teamId, boardId));
+  routeHelper(req, res, ()=>{ 
+    const result = controller.getBoard(teamId, boardId);
+
+    handleResponse(res, result);
+  });
 });
 
 /**
@@ -42,7 +53,11 @@ router.get('/:team_id/:id', async (req, res) => {
 router.delete('/:team_id/:id', async (req, res) => {
   const teamId = req.params.team_id;
   const boardId = req.params.id;
-  routeHelper(req, res, controller.createBoard(teamId, boardId), true);
+  routeHelper(req, res, ()=>{ 
+    const result = controller.deleteBoard(teamId, boardId);
+
+    handleResponse(res, result);
+  }, true);
 });
 
 /**
@@ -51,9 +66,13 @@ router.delete('/:team_id/:id', async (req, res) => {
 * @param {string} req.params.team_id - The ID of the team for which to retrieve boards.
 * @returns {Promise<Object>} The result containing the list of boards for the specified team.
 */
-router.get('/:team_id', async (req, res) => {
-  const teamId = req.params.team_id;
-  routeHelper(req, res, controller.getTeamBoards(teamId));
+router.get('/:teamId', async (req, res) => {
+  routeHelper(req, res, ()=>{
+    const {teamId} = {...req.params}
+    const result = controller.getTeamBoards(teamId);
+
+    handleResponse(res, result);
+  });
 });
 
 module.exports = router;

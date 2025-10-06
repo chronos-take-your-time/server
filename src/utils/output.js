@@ -39,7 +39,13 @@ function humanOutput(type, message, entity="") {
  */
 function handleResponse(res, result) {
   humanOutput(result.status, result.message, result.resource);
-  return res.status(result.status).json({ message: result.message, resource: result.resource });
+  return res
+    .status(result.status)
+    .json({
+      message: result.message,
+      data: result.data,
+      resource: result.resource,
+    });
 }
 
 module.exports = {

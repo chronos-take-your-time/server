@@ -14,10 +14,13 @@ const { clerkClient, getMembership, getById } = require('../utils/clerk');
 router.post('/create/:id', async (req, res) => {
   routeHelper(req, res, async () => {
     try {
-      const { teamId } = req.params;
-      const org = await getById(teamId, 'team');
-      if (!org) return handleResponse(res, { status: 400, message: 'bad request: organization not found', resource: `organization@${teamId}` });
-      const result = await controller.createTeam(teamId);
+      const { id } = req.params;
+
+      //-- usar essa verificação se for criar os times com a api do server --//
+      //const org = await getById(teamId, 'team');
+      //if (!org) return handleResponse(res, { status: 400, message: 'bad request: organization not found', resource: `organization@${teamId}` });
+      
+      const result = controller.createTeam(id);
       handleResponse(res, result);
     } catch (err) {
       handleResponse(res, { status: 500, message: 'internal server error', resource: err.message });
