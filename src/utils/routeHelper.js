@@ -16,7 +16,7 @@ async function routeHelper(req, res, action, admin=false) {
 
     // if the routes needs user to be in the team
     if (teamId != "empty") {
-      await memberOnly(userId, teamId, admin);
+      await memberOnly(userId, teamId, res, admin);
     }
     
     return action();

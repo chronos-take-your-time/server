@@ -34,13 +34,12 @@ function createBoard(teamId, boardId, boardData, customBaseDir) {
       resource: `team@${teamId}`,
     };
   }
-
-  // write file inside teamPath
   const boardPath = path.join(teamPath, `${boardId}.json`);
-  fs.writeFileSync(
-    boardPath,
-    boardData === undefined ? JSON.stringify({}) : boardData, null, 2 // if there is no data write an empty json
-  );
+
+  // use an empty object if boardData is undefined
+  const toWrite = JSON.stringify((boardData === undefined ? {} : boardData), null, 2);
+
+  fs.writeFileSync(boardPath, toWrite);
 
   return {
     status: 201,
@@ -123,9 +122,9 @@ function getTeamBoards(teamId, customBaseDir) {
     return { status: 400, message: `board does not exist`, resource: `team@${teamId}` };
   }
 
+  // write all boardId for a team into boards
   const files = fs.readdirSync(teamPath);
   const boards = files.filter(file => file.endsWith('.json')).map(file => ({ boardId: path.basename(file, '.json'), data: getBoard(teamId, path.basename(file, '.json')).data}));
-
 
   return { status: 200, data: boards, resource: `team@${teamId}` };
 }

@@ -101,9 +101,9 @@ router.delete('/:teamId/:userId', async (req, res) => {
 
       // removing user
       await clerkClient.organizations.deleteOrganizationMembership({ organizationId: teamId, userId: userIdRemoving });
-      handleResponse({ status: 202, message: 'success: user removed from team', resource: `team@${teamId}` });
+      handleResponse(res, { status: 202, message: 'success: user removed from team', resource: `team@${teamId}` });
     } catch (err) {
-      handleResponse({ status: 400, message: `bad request: [${err.message}]` });
+      handleResponse(res, { status: 400, message: `bad request: [${err.message}]` });
     }
   }, true);
 });

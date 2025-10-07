@@ -19,7 +19,7 @@ router.post('/:team_id/:id', async (req, res) => {
   
   routeHelper(req, res, ()=>{
     const result = controller.createBoard(teamId, boardId, boardData);
-    handleResponse(result)
+    handleResponse(res, result)
   });
 });
 
@@ -37,7 +37,7 @@ router.get('/:team_id/:id', async (req, res) => {
 
   routeHelper(req, res, ()=>{ 
     const result = controller.getBoard(teamId, boardId);
-    handleResponse(result);
+    handleResponse(res, result);
   });
 });
 
