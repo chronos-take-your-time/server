@@ -1,11 +1,25 @@
-const { fetchAuthenticated } = require("../utils/useAuthenticated");
+const { fetchAuthenticated } = require('../utils/useAuthenticated');
 
-describe('root', () => {
+const BASE_URL = process.env.TEST_BASE_URL || `http://localhost:3000`;
+
+describe('verificar se a autenticação esta funcionando', () => {
   it('deve ser respondida com sucesso', async () => {
-    const res = await fetchAuthenticated('https://psychic-palm-tree-qx4r9grpj6pf54p-3000.app.github.dev/', {
+    const response = await fetchAuthenticated(`${BASE_URL}/`, {
       method: 'GET',
     });
 
-    expect(res).toBe(200);
+    expect(response).toBeDefined();
+    expect(response.status).toBe(200);
+  });
+});
+
+describe('criar time', () => {
+  it('deve ser respondida com sucesso', async () => {
+    const response = await fetchAuthenticated(`${BASE_URL}/team/create`, {
+      method: 'GET',
+    });
+
+    expect(response).toBeDefined();
+    expect(response.status).toBe(200);
   });
 });
