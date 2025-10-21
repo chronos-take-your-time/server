@@ -7,6 +7,9 @@
 const fs = require("fs");
 const path = require("path");
 const { baseDir, getTeamPath } = require("../controllers/helper");
+const { createTLSchema, defaultShapeSchemas, defaultBindingSchemas } = require("@tldraw/tlschema");
+const { TLSocketRoom } = require("@tldraw/sync-core");
+const { WebSocket } = require("ws");
 
 if (!fs.existsSync(baseDir)) {
   fs.mkdirSync(baseDir, { recursive: true });
@@ -124,10 +127,30 @@ function getTeamBoards(teamId, customBaseDir) {
   }
 
   const files = fs.readdirSync(teamPath);
-  const boards = files.filter(file => file.endsWith('.json')).map(file => ({ boardId: path.basename(file, '.json'), data: getBoard(teamId, path.basename(file, '.json')).data}));
+  const boards = files.filter(file => file.endsWith('.json')).map(file => ({ boardId: path.basename(file, '.json'), data: getBoard(teamId, path.basename(file, '.json')).data }));
 
 
   return { status: 200, data: boards, resource: `team@${teamId}` };
+}
+
+function startBoardRoom(teamId, boardId, customBaseDir) {
+  const schema = createTLSchema({
+    shapes: defaultShapeSchemas,
+    bindings: defaultBindingSchemas
+  })
+
+  const ws = new WebSocket("ws://localhost:3300");
+
+  const room = new TLSocketRoom({
+    schema,
+    clientTimeout: 30000
+  })
+
+  room.handleSocketConnect({
+    sessionId: boardId,
+    socket: ws,
+    isReadonly: false,
+  })
 }
 
 module.exports = {

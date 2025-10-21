@@ -21,6 +21,7 @@ app.use(withAuth());
 const rootRouter = require('./routes/root');
 const teamRouter = require('./routes/teams');
 const boardRouter = require('./routes/boards');
+const { WebSocketServer } = require('ws');
 
 app.use('/', rootRouter);
 app.use('/teams', teamRouter); 
@@ -29,3 +30,6 @@ app.use('/boards', boardRouter);
 app.listen(port, () => {
     console.debug(`[SUCCESS]: Chronos listening on port ${port}`);
 });
+
+
+const ws = new WebSocketServer({port: 3300});
