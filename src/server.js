@@ -22,14 +22,28 @@ const rootRouter = require('./routes/root');
 const teamRouter = require('./routes/teams');
 const boardRouter = require('./routes/boards');
 const { WebSocketServer } = require('ws');
+const { getRoom } = require('./utils/tldraw');
 
 app.use('/', rootRouter);
 app.use('/teams', teamRouter); 
 app.use('/boards', boardRouter); 
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.debug(`[SUCCESS]: Chronos listening on port ${port}`);
 });
 
 
-const ws = new WebSocketServer({port: 3300});
+const ws = new WebSocketServer({server});
+
+ws.on("connection", (ws, req)=>{
+
+    const url = new URL("http://complete.url" + req.url);
+
+    const { sessionId } = url.searchParams;
+
+    const [teamId, boardId] = url.pathname.slice(1).split("/")
+
+    const room = getRoom();
+
+    room.handleSocketConnect({sessionId, socket: ws});
+})

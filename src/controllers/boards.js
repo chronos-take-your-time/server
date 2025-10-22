@@ -133,25 +133,6 @@ function getTeamBoards(teamId, customBaseDir) {
   return { status: 200, data: boards, resource: `team@${teamId}` };
 }
 
-function startBoardRoom(teamId, boardId, customBaseDir) {
-  const schema = createTLSchema({
-    shapes: defaultShapeSchemas,
-    bindings: defaultBindingSchemas
-  })
-
-  const ws = new WebSocket("ws://localhost:3300");
-
-  const room = new TLSocketRoom({
-    schema,
-    clientTimeout: 30000
-  })
-
-  room.handleSocketConnect({
-    sessionId: boardId,
-    socket: ws,
-    isReadonly: false,
-  })
-}
 
 module.exports = {
   createBoard,
