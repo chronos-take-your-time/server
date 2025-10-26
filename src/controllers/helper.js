@@ -1,6 +1,5 @@
 const path = require("path");
 const { humanOutput } = require("../utils/output");
-const path = require("path");
 const baseDir = path.join(__dirname, "..", "teams");
 
 function getTeamPath(teamId, altDir = baseDir) {
