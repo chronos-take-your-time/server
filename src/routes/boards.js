@@ -45,6 +45,52 @@ router.get('/:team_id/:id', async (req, res) => {
   });
 });
 
+router.put('/:team_id/:id', async (req, res) => {
+  const teamId = req.params.team_id;
+  const boardId = req.params.id;
+
+  routeHelper(req, res, ()=>{
+    const { body: boardContent } = req;
+
+    const result = controller.updateBoardContent(teamId, boardId, boardContent);
+
+    const response = handleResponse(result);
+
+    res.status(response.status).json(response.payload);
+  })
+})
+
+router.put('/uploads/:team_id/:id/:asset_id', async (req, res) => {
+  const teamId = req.params.team_id;
+  const boardId = req.params.id;
+  const assetId = req.params.asset_id;
+
+  routeHelper(req, res, ()=>{
+    const { body } = req;
+
+    const result = controller.uploadBoardAsset(teamId, boardId, {id: assetId, dataURL: body});
+
+    const response = handleResponse(result);
+
+    res.status(response.status).json(response.payload);
+  });
+})
+
+router.get('/uploads/:team_id/:id/:asset_id', async (req, res) => {
+  const teamId = req.params.team_id;
+  const boardId = req.params.id;
+  const assetId = req.params.asset_id;
+
+  routeHelper(req, res, ()=>{
+
+    const result = controller.getBoardAsset(teamId, boardId, assetId);
+
+    const response = handleResponse(result);
+
+    res.status(response.status).json(response.payload.data);
+  })
+})
+
 /**
 * Delete the specified board for the given team.
 *
@@ -70,9 +116,12 @@ router.delete('/:team_id/:id', async (req, res) => {
 * @param {string} req.params.team_id - The ID of the team for which to retrieve boards.
 * @returns {Promise<Object>} The result containing the list of boards for the specified team.
 */
-router.get('/:teamId', async (req, res) => {
+router.get('/:team_id', async (req, res) => {
   routeHelper(req, res, ()=>{
-    const {teamId} = {...req.params}
+
+    console.log("chegou aqui")
+
+    const teamId = req.params.team_id;
     const result = controller.getTeamBoards(teamId);
     const response = handleResponse(result);
 
