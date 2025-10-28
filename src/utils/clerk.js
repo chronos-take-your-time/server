@@ -87,10 +87,8 @@ const withAuth = () => {
         
 	        const token = req.query["token"];
             
-            console.log(req.query, req.params);
             const {sub: userId} = token && await verifyToken(token, {secretKey: process.env.CLERK_SECRET_KEY});
             
-
             if (!userId) {
                 handleResponse({ status: 401, message: 'unauthorized without clerk session' });
                 return;
