@@ -68,7 +68,7 @@ router.put('/uploads/:team_id/:id/:asset_id', async (req, res) => {
   routeHelper(req, res, ()=>{
     const { body } = req;
 
-    const result = controller.uploadBoardAsset(teamId, boardId, {id: assetId, dataURL: body});
+    const result = controller.uploadBoardAsset(teamId, boardId, {id: assetId, dataURL: body.file});
 
     const response = handleResponse(result);
 
@@ -118,8 +118,6 @@ router.delete('/:team_id/:id', async (req, res) => {
 */
 router.get('/:team_id', async (req, res) => {
   routeHelper(req, res, ()=>{
-
-    console.log("chegou aqui")
 
     const teamId = req.params.team_id;
     const result = controller.getTeamBoards(teamId);
