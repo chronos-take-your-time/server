@@ -1,8 +1,7 @@
 require('dotenv').config({ path: '../.env' });
 const express = require('express');
 const cors = require('cors'); 
-const { clerkMiddleware } = require('@clerk/express');
-const { withAuth } = require('./utils/clerk');
+const { withAuth, clerkClient } = require('./utils/clerk');
 
 const app = express();
 const port = 3000;
@@ -15,7 +14,6 @@ app.use(cors({
     credentials: true,
 }));
 
-app.use(clerkMiddleware());
 app.use(withAuth()); 
 
 const rootRouter = require('./routes/root');
@@ -43,7 +41,7 @@ ws.on("connection", (ws, req)=>{
 
     const [teamId, boardId] = url.pathname.slice(1).split("/")
 
-    const room = getRoom();
+    const room = getRoom(teamId, boardId);
 
     room.handleSocketConnect({sessionId, socket: ws});
 })
