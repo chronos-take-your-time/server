@@ -163,7 +163,7 @@ function getBoardAsset(teamId, boardId, assetId, customBaseDir) {
 
     return {
       status: 200,
-      data: asset.data,
+      data: asset.dataURL,
       resource: `board@${boardId}`
     }
   } catch {

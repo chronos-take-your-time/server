@@ -1,4 +1,4 @@
-const { WebSocketServer } = require("ws");
+const { WebSocketServer, WebSocket } = require("ws");
 const { getRoom } = require("./tldraw");
 const { TLSocketRoom } = require("@tldraw/sync-core");
 
@@ -22,7 +22,7 @@ function handleConnection(ws, req){
 
   const [teamId, boardId] = path.slice(1).split("/");
 
-  const [sessionId] = search.split("=")[1];
+  const sessionId = search.split("=")[1];
   
   let room;
 
@@ -30,7 +30,7 @@ function handleConnection(ws, req){
     room = getRoom(teamId, boardId);
     
     if(!room) {
-      ws.send("team or board does not exist");
+      ws.send(JSON.stringify({status: 400, message: "team or board does not exist", resource: `board@${boardId}`}));
       return;
     }
 
@@ -39,7 +39,6 @@ function handleConnection(ws, req){
     room = rooms.get(boardId)
   }
 
-  room.handleSocketConnect({ sessionId, socket: ws})
 }
 
 module.exports = {
