@@ -35,6 +35,8 @@ function handleConnection(ws, req){
     }
 
     rooms.set(boardId, room);
+  } else {
+    room = rooms.get(boardId)
   }
 
   room.handleSocketConnect({ sessionId, socket: ws})

@@ -29,7 +29,7 @@ function getRoom(teamId, boardId) {
     initialSnapshot: response.data.content,
     onDataChange: throttle(()=>{
       const currentSnapshot = room.getCurrentSnapshot();
-
+      
       updateBoardContent(teamId, boardId, currentSnapshot);
 
     }, 1000)
