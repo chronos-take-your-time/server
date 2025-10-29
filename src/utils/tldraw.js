@@ -32,7 +32,10 @@ function getRoom(teamId, boardId) {
       
       updateBoardContent(teamId, boardId, currentSnapshot);
 
-    }, 1000)
+    }, 1000),
+    onSessionRemoved: (room, args)=> {
+      if(args.numSessionsRemaining == 0) room.close();
+    }
   });
 
   return room;

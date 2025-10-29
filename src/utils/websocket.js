@@ -13,6 +13,12 @@ function createWebSocketServer(server){
   wss.on("connection", handleConnection);
 }
 
+/**
+ * 
+ * @param {WebSocket} ws 
+ * @param {*} req 
+ * @returns 
+ */
 function handleConnection(ws, req){
 
   const {url} = req;
@@ -20,7 +26,7 @@ function handleConnection(ws, req){
   const path = url.split("?")[0];
   const search = url.split("?")[1].split("&")[0];
 
-  const [teamId, boardId] = path.slice(1).split("/");
+  const [teamId, boardId] = path.slice(1).split("/").map((el)=>decodeURIComponent(el));
 
   const sessionId = search.split("=")[1];
   
@@ -30,15 +36,26 @@ function handleConnection(ws, req){
     room = getRoom(teamId, boardId);
     
     if(!room) {
-      ws.send(JSON.stringify({status: 400, message: "team or board does not exist", resource: `board@${boardId}`}));
       return;
     }
-
+    
     rooms.set(boardId, room);
+
   } else {
     room = rooms.get(boardId)
   }
 
+  room.handleSocketConnect({sessionId, socket: ws})
+
+  const verifyIsClosed = setInterval(()=>{
+    if(room.isClosed()) {
+      rooms.delete(boardId);
+    }
+  }, 1000)
+
+  ws.on("close", ()=> {
+    return clearInterval(verifyIsClosed);
+  })
 }
 
 module.exports = {
