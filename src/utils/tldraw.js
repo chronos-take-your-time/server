@@ -5,9 +5,12 @@ const {
   defaultShapeSchemas,
 } = require("@tldraw/tlschema");
 const { getBoard, updateBoardContent } = require("../controllers/boards");
+const throttle = require("lodash.throttle");
 
 /**
  * Returns a new TLSocketRoom with default schemas and a timeout of 30s
+ * @param {string} teamId 
+ * @param {string} boardId 
  * @returns {TLSocketRoom}
  */
 function getRoom(teamId, boardId) {
@@ -16,17 +19,20 @@ function getRoom(teamId, boardId) {
     shapes: defaultShapeSchemas,
   });
 
-  const board = getBoard(teamId, boardId);
+  const response = getBoard(teamId, boardId);
+
+  if(response.status == 400) return null;
 
   const room = new TLSocketRoom({
     schema,
     clientTimeout: 30000,
-    initialSnapshot: board?.data?.content,
-    onDataChange: ()=>{
+    initialSnapshot: response.data.content,
+    onDataChange: throttle(()=>{
       const currentSnapshot = room.getCurrentSnapshot();
-      //console.log(currentSnapshot)
+
       updateBoardContent(teamId, boardId, currentSnapshot);
-    }
+
+    }, 1000)
   });
 
   return room;
