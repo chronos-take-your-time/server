@@ -93,7 +93,7 @@ function updateBoardContent(teamId, boardId, newContent, customBaseDir) {
   try {
     const data = JSON.parse(fs.readFileSync(boardPath, "utf-8"));
 
-    fs.writeFileSync(boardPath, { ...data, content: newContent });
+    fs.writeFileSync(boardPath, JSON.stringify({ ...data, content: newContent }));
 
     return {
       status: 202,
