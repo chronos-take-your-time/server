@@ -50,10 +50,10 @@ router.put('/:team_id/:id', async (req, res) => {
   const boardId = req.params.id;
 
   routeHelper(req, res, ()=>{
-    const { body: boardContent } = req;
+    const { body: boardInfo } = req;
 
-    const result = controller.updateBoardContent(teamId, boardId, boardContent);
-
+    const result = controller.updateBoardInfo(teamId, boardId, boardInfo);
+    console.log(boardInfo.name)
     const response = handleResponse(result);
 
     res.status(response.status).json(response.payload);

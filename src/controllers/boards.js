@@ -109,6 +109,30 @@ function updateBoardContent(teamId, boardId, newContent, customBaseDir) {
   }
 }
 
+function updateBoardInfo(teamId, boardId, newInfo){
+  const boardPath = getBoardPath(teamId, boardId);
+
+  try{
+    const data = JSON.parse(fs.readFileSync(boardPath, "utf-8"));
+
+    const newData = {...data, name: newInfo.name, logo: newInfo.logo};
+    console.log(newInfo)
+    fs.writeFileSync(boardPath, JSON.stringify(newData));
+
+    return {
+      status:  202,
+      message: `updated at board@${boardId}`,
+      resource: `board@${boardId}` 
+    }
+  } catch {
+    return {
+      status: 400,
+      message: "not found or invalid JSON",
+      resource: `board@${boardId}`
+    };
+  }
+}
+
 /**
  * Upload an asset (image or video) as a dataURL into board JSON
  * @param {string} teamId - Team identifier
@@ -230,6 +254,7 @@ function getTeamBoards(teamId, customBaseDir) {
 module.exports = {
   createBoard,
   getBoard,
+  updateBoardInfo,
   updateBoardContent,
   getBoardAsset,
   uploadBoardAsset,
