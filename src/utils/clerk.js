@@ -84,10 +84,9 @@ async function memberOnly(userId, teamId, res, isAdmin=false) {
 const withAuth = () => {
     return async (req, res, next) => {
         try {
-        
 	        const token = req.query["token"];
             
-            const {sub: userId} = token && await verifyToken(token, {secretKey: process.env.CLERK_SECRET_KEY});
+            const {sub: userId} = (token && await verifyToken(token, {secretKey: process.env.CLERK_SECRET_KEY})) || {};
             
             if (!userId) {
                 handleResponse(res, { status: 401, message: 'unauthorized without clerk session' });
@@ -95,8 +94,8 @@ const withAuth = () => {
             }
             next();
 
-        } catch {
-            handleResponse(res, { status: 500, message: 'server error' });
+        } catch(e) {
+            handleResponse(res, { status: 500, message: e.message });
         }
     };
 };
