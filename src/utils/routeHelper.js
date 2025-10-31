@@ -1,5 +1,7 @@
+require("dotenv").config();
 const { handleResponse } = require('./output');
 const { memberOnly } = require('./clerk');
+const { verifyToken } = require('@clerk/backend');
 
 /**
 * Helper with the base structure for these routes
@@ -11,7 +13,10 @@ const { memberOnly } = require('./clerk');
 */
 async function routeHelper(req, res, action, admin=false) {
   try {
-    const { userId } = req.auth;
+    const { token } = req.query;
+
+    const { sub: userId } = token && await verifyToken(token, {secretKey: process.env.CLERK_SECRET_KEY});
+
     const teamId = req.params.teamId ? req.params.teamId : 'empty';
 
     // if the routes needs user to be in the team

@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { createClerkClient } = require('@clerk/backend');
+const { createClerkClient, verifyToken } = require('@clerk/backend');
 const { handleResponse } = require('./output');
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 console.log(process.env.CLERK_SECRET_KEY);
@@ -84,7 +84,10 @@ async function memberOnly(userId, teamId, res, isAdmin=false) {
 const withAuth = () => {
     return async (req, res, next) => {
         try {
-            const { userId } = req.auth;
+        
+	        const token = req.query["token"];
+            
+            const {sub: userId} = token && await verifyToken(token, {secretKey: process.env.CLERK_SECRET_KEY});
             
             if (!userId) {
                 handleResponse(res, { status: 401, message: 'unauthorized without clerk session' });
