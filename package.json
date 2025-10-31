@@ -22,11 +22,13 @@
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "fs": "^0.0.1-security",
+    "node-fetch": "^3.3.2",
     "path": "^0.12.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.37.0",
     "eslint": "^9.37.0",
+    "eslint-plugin-jest": "^29.0.1",
     "globals": "^16.4.0",
     "jest": "^30.0.5",
     "nodemon": "^3.1.10",

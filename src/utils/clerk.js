@@ -70,13 +70,13 @@ async function getMembership(teamId, userId) {
  * @param {string} teamId - Unique identifier of the team.
  * @returns {Promise<Object>} The result of the board creation operation.
  */
-async function memberOnly(userId, teamId, isAdmin=false) {
+async function memberOnly(userId, teamId, res, isAdmin=false) {
     if (isAdmin && !(await isUserTeam(userId, teamId))) {
-        return handleResponse({ status: 403, message: 'forbidden: only team admins can perform this action', resource: `organization@${teamId}` });
+        return handleResponse(res, { status: 403, message: 'forbidden: only team admins can perform this action', resource: `organization@${teamId}` });
     }
   
     if (!isAdmin && !(await isUserTeam(userId, teamId, 'org:member'))) {
-        return handleResponse({ status: 403, message: 'forbidden: only team members can perform this action', resource: `organization@${teamId}` });
+        return handleResponse(res, { status: 403, message: 'forbidden: only team members can perform this action', resource: `organization@${teamId}` });
     }
 }
 
@@ -87,13 +87,13 @@ const withAuth = () => {
             const { userId } = req.auth;
             
             if (!userId) {
-                handleResponse({ status: 401, message: 'unauthorized without clerk session' });
+                handleResponse(res, { status: 401, message: 'unauthorized without clerk session' });
                 return;
             }
             next();
 
         } catch {
-            handleResponse({ status: 500, message: 'server error' });
+            handleResponse(res, { status: 500, message: 'server error' });
         }
     };
 };

@@ -29,17 +29,17 @@ afterEach(() => {
 describe('Team Controller', () => {
   test('creates team successfully', () => {
     const result = createTeam('newTeam', tmpDir);
-    expect(result.status).toBe('success');
+    expect(result.status).toBe(201);
   });
 
   test('deletes existing team successfully', () => {
     const result = deleteTeam(fakeTeamId, tmpDir);
-    expect(result.status).toBe('success');
+    expect(result.status).toBe(202);
   });
 
   test('doesnt delete non-existing team', () => {
     const result = deleteTeam('non_existing_team', tmpDir);
-    expect(result.status).toBe('error');
+    expect(result.status).toBe(400);
   });
 });
 
@@ -47,20 +47,20 @@ describe('Team Controller', () => {
 describe('Board Controller', () => {
   test('creates board successfully', () => {
     const result = setupBoard();
-    expect(result.status).toBe('success');
+    expect(result.status).toBe(201);
   });
 
   test('returns board successfully', () => {
     setupBoard();
     const result = getBoard(fakeTeamId, fakeBoardId, tmpDir);
-    expect(result.status).toBe('success');
+    expect(result.status).toBe(202);
     expect(result.data).toEqual(fakeBoardData);
   });
 
   test('deletes board successfully', () => {
     setupBoard();
     const result = deleteBoard(fakeTeamId, fakeBoardId, tmpDir);
-    expect(result.status).toBe('success');
+    expect(result.status).toBe(202);
   });
 
   test('get team boards', () => {
@@ -72,6 +72,6 @@ describe('Board Controller', () => {
 
     // sort to prevent false negatives due to order
     const sortById = arr => arr.sort((a, b) => a.boardId.localeCompare(b.boardId));
-    expect(sortById(result)).toStrictEqual(sortById(expected));
+    expect(sortById(result.data)).toEqual(sortById(expected));
   });
 });
