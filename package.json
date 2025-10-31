@@ -26,10 +26,12 @@
     "lodash.throttle": "^4.1.1",
     "path": "^0.12.7",
     "ws": "^8.18.3"
+    "node-fetch": "^3.3.2",
   },
   "devDependencies": {
     "@eslint/js": "^9.37.0",
     "eslint": "^9.37.0",
+    "eslint-plugin-jest": "^29.0.1",
     "globals": "^16.4.0",
     "jest": "^30.0.5",
     "nodemon": "^3.1.10",
