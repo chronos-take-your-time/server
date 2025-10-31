@@ -25,8 +25,8 @@
     "fs": "^0.0.1-security",
     "lodash.throttle": "^4.1.1",
     "path": "^0.12.7",
-    "ws": "^8.18.3"
-    "node-fetch": "^3.3.2",
+    "ws": "^8.18.3",
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.37.0",
