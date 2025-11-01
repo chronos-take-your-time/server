@@ -1,8 +1,8 @@
 require('dotenv').config({ path: '../.env' });
-const express = require('express');
 const { clerkMiddleware } = require('@clerk/express');
+const { clerkClient } = require('./utils/clerk');
+const express = require('express');
 const cors = require('cors'); 
-const { withAuth, clerkClient } = require('./utils/clerk');
 
 const app = express();
 const port = 3000;
@@ -14,7 +14,6 @@ app.use(cors({
     allowedHeaders: 'Content-Type, Authorization, X-Requested-With, Accept',
 }));
 
-//app.use(withAuth()); 
 app.use(clerkMiddleware({ clerkClient }));
 
 const rootRouter = require('./routes/root');
