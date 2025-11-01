@@ -13,13 +13,12 @@ const { verifyToken } = require('@clerk/backend');
 */
 async function routeHelper(req, res, action, admin=false) {
   try {
-    const { token } = req.query;
-
-    const { sub: userId } = token && await verifyToken(token, {secretKey: process.env.CLERK_SECRET_KEY});
+    const authHeader = req.headers.authorization;
+    const token = authHeader.split(' ')[1];
+    const { userId } = await verifyToken(token, {secretKey: process.env.CLERK_SECRET_KEY});
 
     const teamId = req.params.teamId ? req.params.teamId : 'empty';
 
-    // if the routes needs user to be in the team
     if (teamId != "empty") {
       await memberOnly(userId, teamId, res, admin);
     }

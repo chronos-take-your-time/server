@@ -2,7 +2,6 @@ require('dotenv').config();
 const { createClerkClient, verifyToken } = require('@clerk/backend');
 const { handleResponse } = require('./output');
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
-console.log(process.env.CLERK_SECRET_KEY);
 
 /**
  * Retrieves a user or organization from Clerk by its ID.
@@ -58,10 +57,17 @@ async function isUserTeam(userId, teamId, roleRequired = 'org:admin') {
  * @returns {Promise<object|null>} Membership object if found, otherwise null.
  */
 async function getMembership(teamId, userId) {
-    let members = await clerkClient.organizations.getOrganizationMembershipList({ organizationId: teamId });
-    return members.data.find(m => m.publicUserData?.userId === userId) || null;
+    try {
+        let members = await clerkClient.organizations.getOrganizationMembershipList({
+            organizationId: teamId,
+            userId: userId,
+            limit: 1
+        });
+        return members.data[0] || null;
+    } catch (error) {
+        return null;
+    }
 }
-
 /**
  * Helper to protect routes for team member or admin actions
  *
@@ -84,21 +90,18 @@ async function memberOnly(userId, teamId, res, isAdmin=false) {
 const withAuth = () => {
     return async (req, res, next) => {
         try {
-	        const token = req.query["token"];
-            
-            const {sub: userId} = (token && await verifyToken(token, {secretKey: process.env.CLERK_SECRET_KEY})) || {};
-            
-            if (!userId) {
+            const token = req.headers.authorization.split(' ')[1];
+            console.log(token)
+            if (!token) {  
                 handleResponse(res, { status: 401, message: 'unauthorized without clerk session' });
                 return;
             }
             next();
-
         } catch(e) {
             handleResponse(res, { status: 500, message: e.message });
         }
     };
-};
+}
 
 module.exports = {
     clerkClient,
