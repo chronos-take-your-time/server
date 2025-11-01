@@ -19,7 +19,9 @@ router.post('/:team_id/:id', async (req, res) => {
   
   routeHelper(req, res, ()=>{
     const result = controller.createBoard(teamId, boardId, boardData);
-    const response = handleResponse(result);
+    console.log(result);
+    const response = handleResponse(res, result);
+    console.log(response);
 
     res.status(response.status).json(response.payload);
   });
@@ -39,7 +41,7 @@ router.get('/:team_id/:id', async (req, res) => {
 
   routeHelper(req, res, ()=>{ 
     const result = controller.getBoard(teamId, boardId);
-    const response = handleResponse(result);
+    const response = handleResponse(res, result);
 
     res.status(response.status).json(response.payload);
   });
@@ -48,15 +50,14 @@ router.get('/:team_id/:id', async (req, res) => {
 router.put('/:team_id/:id', async (req, res) => {
   const teamId = req.params.team_id;
   const boardId = req.params.id;
+  const changes = {name: req.body.boardName, logo: req.body.customLogo};
 
-  routeHelper(req, res, ()=>{
-    const { body: boardInfo } = req;
+  routeHelper(req, res, async ()=>{
+    const result = await controller.updateBoardInfo(teamId, boardId, changes);
 
-    const result = controller.updateBoardInfo(teamId, boardId, boardInfo);
-    console.log(boardInfo.name)
-    const response = handleResponse(result);
-
-    res.status(response.status).json(response.payload);
+    const response = handleResponse(res, result);
+    console.log(response);
+    //res.status(response.status).json(response.payload);
   })
 })
 
@@ -70,7 +71,7 @@ router.put('/uploads/:team_id/:id/:asset_id', async (req, res) => {
 
     const result = controller.uploadBoardAsset(teamId, boardId, {id: assetId, dataURL: body.file});
 
-    const response = handleResponse(result);
+    const response = handleResponse(res, result);
 
     res.status(response.status).json(response.payload);
   });
@@ -85,7 +86,7 @@ router.get('/uploads/:team_id/:id/:asset_id', async (req, res) => {
 
     const result = controller.getBoardAsset(teamId, boardId, assetId);
 
-    const response = handleResponse(result);
+    const response = handleResponse(res, result);
 
     res.status(response.status).json(response.payload.data);
   })
@@ -104,7 +105,7 @@ router.delete('/:team_id/:id', async (req, res) => {
 
   routeHelper(req, res, ()=>{ 
     const result = controller.deleteBoard(teamId, boardId);
-    const response = handleResponse(result);
+    const response = handleResponse(res, result);
 
     res.status(response.status).json(response.payload);
   }, true);
@@ -118,12 +119,9 @@ router.delete('/:team_id/:id', async (req, res) => {
 */
 router.get('/:team_id', async (req, res) => {
   routeHelper(req, res, ()=>{
-
     const teamId = req.params.team_id;
     const result = controller.getTeamBoards(teamId);
-    const response = handleResponse(result);
-
-    res.status(response.status).json(response.payload);
+    handleResponse(res, result, true);
   });
 });
 

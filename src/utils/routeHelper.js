@@ -12,20 +12,21 @@ const { verifyToken } = require('@clerk/backend');
 * @returns {Promise<Object>} The result of the operation.
 */
 async function routeHelper(req, res, action, admin=false) {
+  
   try {
-    const authHeader = req.headers.authorization;
-    const token = authHeader.split(' ')[1];
-    const { userId } = await verifyToken(token, {secretKey: process.env.CLERK_SECRET_KEY});
+    const token = req.headers.authorization.split(' ')[1];
+    const payload = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY });
+    const userId = payload.sub;
 
+    // if the route needs a team check
     const teamId = req.params.teamId ? req.params.teamId : 'empty';
-
     if (teamId != "empty") {
       await memberOnly(userId, teamId, res, admin);
     }
-    
+  
     return action();
   } catch (err) {
-    handleResponse(res, { status: 401, message: 'unauthorized', resource: err.message });
+    console.log("Route helper error:", err.message);
   }
 }
 

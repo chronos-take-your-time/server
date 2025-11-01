@@ -3,8 +3,7 @@
  * @description Handles filesystem operations for board creation, deletion, and management.
  * @see {@link https://chronos-take-your-time.github.io/wiki/arquitetura/servidor/dados/} for details
  */
-
-const fs = require("fs");
+const fs = require('fs');
 const path = require("path");
 const { baseDir, getTeamPath, getBoardPath } = require("../controllers/helper");
 
@@ -38,7 +37,6 @@ function createBoard(teamId, boardId, boardData, customBaseDir) {
 
   // use an empty object if boardData is undefined
   const toWrite = JSON.stringify((boardData === undefined ? {} : boardData), null, 2);
-
   fs.writeFileSync(boardPath, toWrite);
 
   return {
@@ -108,28 +106,42 @@ function updateBoardContent(teamId, boardId, newContent, customBaseDir) {
   }
 }
 
-function updateBoardInfo(teamId, boardId, newInfo){
-  const boardPath = getBoardPath(teamId, boardId);
+async function updateBoardInfo(teamId, boardId, changes) {
+  const separator = boardId.indexOf('_');
+  const uuid = boardId.substring(separator);
+  const oldPath = getBoardPath(teamId, boardId);
 
-  try{
-    const data = JSON.parse(fs.readFileSync(boardPath, "utf-8"));
+  let boardPath = oldPath;
+  let newBoardId = boardId; 
 
-    const newData = {...data, name: newInfo.name, logo: newInfo.logo};
-    console.log(newInfo)
-    fs.writeFileSync(boardPath, JSON.stringify(newData));
+  // rename if needed
+  if (changes.name) {
+    newBoardId = `${changes.name}${uuid}`;
+    const newPath = getBoardPath(teamId, newBoardId);
 
-    return {
-      status:  202,
-      message: `updated at board@${boardId}`,
-      resource: `board@${boardId}` 
-    }
-  } catch {
-    return {
-      status: 400,
-      message: "not found or invalid JSON",
-      resource: `board@${boardId}`
-    };
+    console.log(`Renomeando: ${oldPath} -> ${newPath}`);
+
+    await fs.promises.rename(oldPath, newPath);
+    boardPath = newPath;
   }
+
+  // change logo if needed
+  if (changes.logo) {
+    console.log(`Atualizando logo em: ${boardPath}`);
+
+    const data = JSON.parse(await fs.promises.readFile(boardPath, "utf-8"));
+    const newData = { ...data, logo: changes.logo };
+
+    await fs.promises.writeFile(boardPath, JSON.stringify(newData, null, 2));
+    console.log("Logo atualizado.");
+  }
+
+  return {
+    status: 200,
+    message: `updated at board@${newBoardId}`,
+    resource: `board@${newBoardId}`,
+    data: { id: newBoardId, name: changes.name, logo: changes.logo }
+  };
 }
 
 /**
@@ -239,14 +251,27 @@ function getTeamBoards(teamId, customBaseDir) {
   const teamPath = path.join(root, teamId);
 
   if (!fs.existsSync(teamPath)) {
-    return { status: 400, message: `board does not exist`, resource: `team@${teamId}` };
+    return { status: 400, message: 'board does not exist', resource: `team@${teamId}` };
   }
 
-  // write all boardId for a team into boards
   const files = fs.readdirSync(teamPath);
-  const boards = files.filter(file => file.endsWith('.json')).map(file => ({ boardId: path.basename(file, '.json'), data: getBoard(teamId, path.basename(file, '.json')).data }));
 
-  return { status: 200, data: boards, resource: `team@${teamId}` };
+  const boards = files
+    .filter(file => file.endsWith('.json'))
+    .map(file => {
+      const filePath = path.join(teamPath, file);
+      const stats = fs.statSync(filePath);
+      const boardId = path.basename(file, '.json');
+      const boardName = boardId.replace(/_([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})$/i, '');
+
+      return { 
+        boardId: boardId,
+        boardName: boardName,
+        createdAt: stats.birthtime,
+        data: getBoard(teamId, boardId).data 
+      };
+    });
+  return { status: 200, message: 'boards retrieved', data: boards, resource: `team@${teamId}` };
 }
 
 
