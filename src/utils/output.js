@@ -38,7 +38,7 @@ function humanOutput(type, message, entity="") {
  */
 function handleResponse(res, result, shutup = false) {
   if (!shutup) humanOutput(result.status, result.message, result.resource);
-  // console.log(result.data);
+
   return res
   .status(result.status)
   .json({
