@@ -14,7 +14,7 @@ const { verifyToken } = require('@clerk/backend');
 async function routeHelper(req, res, action, admin=false) {
   
   try {
-    const token = req.headers.authorization.split(' ')[1];
+    const { token } = req.query;
     const payload = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY, clockSkewInMs: 30000 });
     const userId = payload.sub; 
 
