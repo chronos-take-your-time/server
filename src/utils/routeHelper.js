@@ -15,8 +15,8 @@ async function routeHelper(req, res, action, admin=false) {
   
   try {
     const token = req.headers.authorization.split(' ')[1];
-    const payload = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY });
-    const userId = payload.sub;
+    const payload = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY, clockSkewInMs: 30000 });
+    const userId = payload.sub; 
 
     // if the route needs a team check
     const teamId = req.params.teamId ? req.params.teamId : 'empty';

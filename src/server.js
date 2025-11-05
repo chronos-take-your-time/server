@@ -14,8 +14,6 @@ app.use(cors({
     allowedHeaders: 'Content-Type, Authorization, X-Requested-With, Accept',
 }));
 
-app.use(clerkMiddleware({ clerkClient }));
-
 const rootRouter = require('./routes/root');
 const teamRouter = require('./routes/teams');
 const boardRouter = require('./routes/boards');
