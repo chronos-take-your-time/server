@@ -20,7 +20,7 @@ async function getById(id, type) {
         return ent;
     } catch {
         const message = type === 'user' ? 'user not found' : 'organization not found';
-        return handleResponse({ status: 404, message: message });
+        throw new Error(message);
     }
 }
 

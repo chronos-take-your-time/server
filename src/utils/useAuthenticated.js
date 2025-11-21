@@ -15,8 +15,6 @@ async function fetchAuthenticated(url, options) {
     headers,
   });
 
-  console.log(res)
-
   return res;
 }
 

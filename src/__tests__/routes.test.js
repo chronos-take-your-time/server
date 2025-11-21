@@ -1,6 +1,6 @@
 const { fetchWithToken } = require('../utils/useAuthenticated');
 
-const BASE_URL = process.env.TEST_BASE_URL || `http://localhost:3000`;
+const BASE_URL = process.env.TEST_BASE_URL || import.meta.env.VITE_API_URL;
 
 describe('verificar se a autenticação esta funcionando', () => {
   it('deve ser respondida com sucesso', async () => {

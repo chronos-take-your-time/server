@@ -36,15 +36,16 @@ function humanOutput(type, message, entity="") {
  * @param {*} result.resource - The resource to include in the response.
  * @returns {object} The response sent to the client.
  */
-function handleResponse(res, result) {
-  humanOutput(result.status, result.message, result.resource);
+function handleResponse(res, result, shutup = false) {
+  if (!shutup) humanOutput(result.status, result.message, result.resource);
+
   return res
-    .status(result.status)
-    .json({
-      message: result.message,
-      data: result.data,
-      resource: result.resource,
-    });
+  .status(result.status)
+  .json({
+    message: result.message,
+    data: result.data,
+    resource: result.resource,
+  });
 }
 
 module.exports = {
