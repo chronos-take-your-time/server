@@ -19,43 +19,51 @@ function createWebSocketServer(server){
  * @param {*} req 
  * @returns 
  */
-function handleConnection(ws, req){
 
-  const {url} = req;
+let mutex = Promise.resolve(null);
 
-  const path = url.split("?")[0];
-  const search = url.split("?")[1].split("&")[0];
-
-  const [teamId, boardId] = path.slice(1).split("/").map((el)=>decodeURIComponent(el));
-
-  const sessionId = search.split("=")[1];
+async function handleConnection(ws, req){
   
-  let room;
-
-  if(!rooms.has(boardId)) {
-    room = getRoom(teamId, boardId);
+  mutex = mutex.then(
+    async () => {
+      const {url} = req;
     
-    if(!room) {
-      return;
-    }
+      const path = url.split("?")[0];
+      const search = url.split("?")[1].split("&")[0];
     
-    rooms.set(boardId, room);
+      const [teamId, boardId] = path.slice(1).split("/").map((el)=>decodeURIComponent(el));
+    
+      const sessionId = search.split("=")[1];
+      
+      let room;
+    
+      if(!rooms.has(boardId)) {
+        room = getRoom(teamId, boardId);
+        
+        if(!room) {
+          return;
+        }
+        
+        rooms.set(boardId, room);
+    
+      } else {
+        room = rooms.get(boardId)
+      }
+    
+      room.handleSocketConnect({sessionId, socket: ws})
+    
+      const verifyIsClosed = setInterval(()=>{
+        if(room.isClosed()) {
+          rooms.delete(boardId);
+        }
+      }, 1000);
 
-  } else {
-    room = rooms.get(boardId)
-  }
-
-  room.handleSocketConnect({sessionId, socket: ws})
-
-  const verifyIsClosed = setInterval(()=>{
-    if(room.isClosed()) {
-      rooms.delete(boardId);
+      ws.on("close", ()=> {
+        return clearInterval(verifyIsClosed);
+      })
     }
-  }, 1000)
+  )
 
-  ws.on("close", ()=> {
-    return clearInterval(verifyIsClosed);
-  })
 }
 
 module.exports = {
