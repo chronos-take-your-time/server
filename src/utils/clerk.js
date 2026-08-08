@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { createClerkClient, verifyToken } = require('@clerk/backend');
+const { createClerkClient } = require('@clerk/backend');
 const { handleResponse } = require('./output');
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 
@@ -15,8 +15,8 @@ const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY 
 async function getById(id, type) {
     try {
         const ent = type === 'user'
-        ? await clerkClient.users.getUser(id)
-        : await clerkClient.organizations.getOrganization({ organizationId: id });
+            ? await clerkClient.users.getUser(id)
+            : await clerkClient.organizations.getOrganization({ organizationId: id });
         return ent;
     } catch {
         const message = type === 'user' ? 'user not found' : 'organization not found';
@@ -64,32 +64,57 @@ async function getMembership(teamId, userId) {
             limit: 1
         });
         return members.data[0] || null;
-    } catch (error) {
+    } catch {
         return null;
     }
 }
+
 /**
- * Helper to protect routes for team member or admin actions
+ * Ensure user is a team admin
  *
  * @async
- * @param {string} userId - Unique identifier of the user.
- * @param {string} teamId - Unique identifier of the team.
- * @returns {Promise<Object>} The result of the board creation operation.
+ * @param {string} userId
+ * @param {string} teamId
+ * @param {Object} res
  */
-async function memberOnly(userId, teamId, res, isAdmin=false) {
-    if (isAdmin && !(await isUserTeam(userId, teamId))) {
-        return handleResponse(res, { status: 403, message: 'forbidden: only team admins can perform this action', resource: `organization@${teamId}` });
-    }
-  
-    if (!isAdmin && !(await isUserTeam(userId, teamId, 'org:member'))) {
-        return handleResponse(res, { status: 403, message: 'forbidden: only team members can perform this action', resource: `organization@${teamId}` });
+async function adminOnly(userId, teamId, res) {
+    const isAuthorized = await isUserTeam(userId, teamId);
+
+    if (!isAuthorized) {
+        return handleResponse(res, {
+            status: 403,
+            message: 'forbidden: only team admins can perform this action',
+            resource: `organization@${teamId}`
+        });
     }
 }
+
+/**
+ * Ensure user is a team member
+ *
+ * @async
+ * @param {string} userId 
+ * @param {string} teamId
+ * @param {Object} res
+ */
+async function memberOnly(userId, teamId, res) {
+    const isAuthorized = await isUserTeam(userId, teamId, 'org:member');
+
+    if (!isAuthorized) {
+        return handleResponse(res, {
+            status: 403,
+            message: 'forbidden: only team members can perform this action',
+            resource: `organization@${teamId}`
+        });
+    }
+}
+
 
 module.exports = {
     clerkClient,
     getMembership,
     isUserTeam,
     getById,
+    adminOnly,
     memberOnly
 };
