@@ -1,4 +1,5 @@
 require('dotenv').config();
+
 async function fetchAuthenticated(url, options) {
   const token = process.env.TEST_USER_TOKEN;
 

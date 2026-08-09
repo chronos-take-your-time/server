@@ -1,11 +1,15 @@
+const fs = require("fs");
 const path = require("path");
 const { humanOutput } = require("../utils/output");
+
 const baseDir = path.join(__dirname, "..", "teams");
 
+if (!fs.existsSync(baseDir)) {
+  fs.mkdirSync(baseDir, { recursive: true });
+}
+
 function getTeamPath(teamId, altDir = baseDir) {
-  if (!teamId) {
-    return humanOutput(400, "getTeamPath called without teamId");
-  }
+  if (!teamId) return humanOutput(400, "getTeamPath called without teamId");
   return path.join(altDir, teamId);
 }
 
@@ -15,8 +19,4 @@ function getBoardPath(teamId, boardId, altDir = baseDir) {
   return path.join(altDir, teamId, `${boardId}.json`);
 }
 
-module.exports = {
-  getTeamPath,
-  getBoardPath,
-  baseDir,
-};
+module.exports = { getTeamPath, getBoardPath, baseDir };

@@ -4,114 +4,40 @@ const controller = require('../controllers/boards');
 const { routeHelper } = require('../utils/routeHelper');
 const { handleResponse } = require('../utils/output');
 
-/**
-* Create a new board for the specified team and board ID.
-*
-* @param {string} req.params.team_id - The ID of the team to which the board belongs.
-* @param {string} req.params.id - The ID for the new board.
-* @param {Object} req.body - The request body containing board details, which will be stringified.
-* @returns {Promise<Object>} The result of the board creation operation.
-*/
 router.post('/:team_id/:id', async (req, res) => {
-  const teamId = req.params.team_id;
-  const boardId = req.params.id;
-  const boardData = req.body;
-  
-  routeHelper(req, res, ()=>{
-    const result = controller.createBoard(teamId, boardId, boardData);
-    
-    handleResponse(res, result);
-  });
+  const { team_id: teamId, id: boardId } = req.params;
+  routeHelper(req, res, () => handleResponse(res, controller.createBoard(teamId, boardId, req.body)));
 });
 
-/**
-* Return the board JSON for the specified team and board ID.
-*
-* @param {string} req.params.team_id - The ID of the team to which the board belongs.
-* @param {string} req.params.id - The ID for the new board.
-* @param {Object} req.body - The request body containing board details, which will be stringified.
-* @returns {Promise<Object>} The result of the board return operation.
-*/
 router.get('/:team_id/:id', async (req, res) => {
-  const teamId = req.params.team_id;
-  const boardId = req.params.id;
-
-  routeHelper(req, res, ()=>{ 
-    const result = controller.getBoard(teamId, boardId);
-
-    handleResponse(res, result);
-  });
+  const { team_id: teamId, id: boardId } = req.params;
+  routeHelper(req, res, () => handleResponse(res, controller.getBoard(teamId, boardId)));
 });
 
 router.put('/:team_id/:id', async (req, res) => {
-  const teamId = req.params.team_id;
-  const boardId = req.params.id;
-  const changes = {name: req.body.boardName, logo: req.body.logo};
-
-  routeHelper(req, res, async ()=>{
-    const result = await controller.updateBoardInfo(teamId, boardId, changes);
-
-    handleResponse(res, result);
-  })
-})
-
-router.put('/uploads/:team_id/:id/:asset_id', async (req, res) => {
-  const teamId = req.params.team_id;
-  const boardId = req.params.id;
-  const assetId = req.params.asset_id;
-
-  routeHelper(req, res, ()=>{
-    const { body } = req;
-
-    const result = controller.uploadBoardAsset(teamId, boardId, {id: assetId, dataURL: body.file});
-
-    handleResponse(res, result);
-  });
-})
-
-router.get('/uploads/:team_id/:id/:asset_id', async (req, res) => {
-  const teamId = req.params.team_id;
-  const boardId = req.params.id;
-  const assetId = req.params.asset_id;
-
-  routeHelper(req, res, ()=>{
-
-    const result = controller.getBoardAsset(teamId, boardId, assetId);
-
-    handleResponse(res, result);
-  })
-})
-
-/**
-* Delete the specified board for the given team.
-*
-* @param {string} req.params.team_id - The ID of the team to which the board belongs.
-* @param {string} req.params.id - The ID of the board to delete.
-* @returns {Promise<Object>} The result of the board deletion operation.
-*/
-router.delete('/:team_id/:id', async (req, res) => {
-  const teamId = req.params.team_id;
-  const boardId = req.params.id;
-
-  routeHelper(req, res, ()=>{ 
-    const result = controller.deleteBoard(teamId, boardId);
-    handleResponse(res, result);
-
-  }, true);
+  const { team_id: teamId, id: boardId } = req.params;
+  const changes = { name: req.body.boardName, logo: req.body.logo };
+  routeHelper(req, res, async () => handleResponse(res, await controller.updateBoardInfo(teamId, boardId, changes)));
 });
 
-/**
-* Get all boards for a specific team.
-*
-* @param {string} req.params.team_id - The ID of the team for which to retrieve boards.
-* @returns {Promise<Object>} The result containing the list of boards for the specified team.
-*/
+router.put('/uploads/:team_id/:id/:asset_id', async (req, res) => {
+  const { team_id: teamId, id: boardId, asset_id: assetId } = req.params;
+  routeHelper(req, res, () => handleResponse(res, controller.uploadBoardAsset(teamId, boardId, { id: assetId, dataURL: req.body.file })));
+});
+
+router.get('/uploads/:team_id/:id/:asset_id', async (req, res) => {
+  const { team_id: teamId, id: boardId, asset_id: assetId } = req.params;
+  routeHelper(req, res, () => handleResponse(res, controller.getBoardAsset(teamId, boardId, assetId)));
+});
+
+router.delete('/:team_id/:id', async (req, res) => {
+  const { team_id: teamId, id: boardId } = req.params;
+  routeHelper(req, res, () => handleResponse(res, controller.deleteBoard(teamId, boardId)), true);
+});
+
 router.get('/:team_id', async (req, res) => {
-  routeHelper(req, res, ()=>{
-    const teamId = req.params.team_id;
-    const result = controller.getTeamBoards(teamId);
-    handleResponse(res, result, true);
-  });
+  const { team_id: teamId } = req.params;
+  routeHelper(req, res, () => handleResponse(res, controller.getTeamBoards(teamId), true));
 });
 
 module.exports = router;

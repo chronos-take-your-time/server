@@ -32,6 +32,7 @@
               exit 1
             fi
             
+            echo ""
             echo "Chronos Server development environment loaded"
             echo "  Node: $(node --version)"
             echo ""

@@ -1,41 +1,31 @@
 require("dotenv").config();
 const { memberOnly, adminOnly } = require('./clerk');
+const { handleResponse } = require('./output');
 const { verifyToken } = require('@clerk/backend');
 
-/**
-* Helper with the base structure for these routes
-*
-* @param {Object} req - Request object.
-* @param {Object} res - Response object.
-* @param {Function} action - A function to be executed.
-* @param {boolean} [admin=false] - Requires admin privileges.
-* @returns {Promise<any>} The result of the operation.
-*/
 async function routeHelper(req, res, action, admin = false) {
   try {
     const { token } = req.query;
     const payload = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY, clockSkewInMs: 30000 });
     const userId = payload.sub;
-
-    const teamId = req.params.teamId;
+    const { teamId } = req.params;
 
     if (teamId) {
       const authResponse = admin
         ? await adminOnly(userId, teamId, res)
         : await memberOnly(userId, teamId, res);
 
-      if (authResponse) {
-        return authResponse;
-      }
+      if (authResponse) return authResponse;
     }
 
     return action();
   } catch (err) {
-    console.error("Route helper error:", err.message);
-    return res.status(500).json({ error: "Internal Server Error" });
+    let message = 'This is the wrong way to call Chronos API, check out https://github.com/chronos-take-your-time/server for more information.';
+    if (err.reason == 'token-invalid') {
+      message = 'You are not logged in in Chronos, please use the oficial Chronos Desktop Application.';
+    }
+    handleResponse(res, { status: 500, message });
   }
 }
 
-module.exports = {
-  routeHelper
-};
+module.exports = { routeHelper };
