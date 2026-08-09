@@ -14,9 +14,6 @@ Crie e preencha o arquivo `.env` com as credenciais corretas do Clerk.
 
 > O script `./start.sh` é uma mais forma conveniente de executar a aplicação recriando seus containers do zero.
 
-# Endpoints (Imcompleto)
-A documentação dos endpoints está disponível em [Documentação OpenAPI/Postman](https://github.com/chronos-take-your-time/open-api/)
-
 ## Routes
 As *routes* essencialmente mapeiam os *controllers*, sendo como uma camada de contato que pode ser usada como reforço de segurança sanitizando e controlando o acesso.
 
